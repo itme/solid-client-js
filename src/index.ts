@@ -28,6 +28,7 @@ export {
 } from "./resource/resource";
 export {
   unstable_fetchFile,
+  unstable_fetchFileWithAcl,
   unstable_deleteFile,
   unstable_saveFileInContainer,
   unstable_overwriteFile,
