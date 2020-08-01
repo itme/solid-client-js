@@ -25,22 +25,20 @@ export {
   isLitDataset,
   getFetchedFrom,
   getContentType,
-  unstable_saveAclFor,
-  unstable_deleteAclFor,
-} from "./resource";
+} from "./resource/resource";
 export {
   unstable_fetchFile,
   unstable_deleteFile,
   unstable_saveFileInContainer,
   unstable_overwriteFile,
-} from "./nonRdfData";
+} from "./resource/nonRdfData";
 export {
   createLitDataset,
   fetchLitDataset,
   saveLitDatasetAt,
   saveLitDatasetInContainer,
   unstable_fetchLitDatasetWithAcl,
-} from "./litDataset";
+} from "./resource/litDataset";
 export {
   getThingOne,
   getThingAll,
@@ -49,7 +47,7 @@ export {
   createThing,
   asUrl,
   asIri,
-} from "./thing";
+} from "./thing/thing";
 export {
   getUrlOne,
   getIriOne,
@@ -138,8 +136,11 @@ export {
   unstable_getFallbackAcl,
   unstable_hasResourceAcl,
   unstable_getResourceAcl,
+  unstable_createAcl,
   unstable_createAclFromFallbackAcl,
-} from "./acl";
+  unstable_saveAclFor,
+  unstable_deleteAclFor,
+} from "./acl/acl";
 export {
   unstable_AgentAccess,
   unstable_getAgentAccessOne,
@@ -164,13 +165,6 @@ export {
   unstable_getPublicResourceAccess,
   unstable_getPublicDefaultAccess,
 } from "./acl/class";
-export {
-  unstable_discoverInbox,
-  unstable_fetchInbox,
-  unstable_buildNotification,
-  unstable_sendNotification,
-  unstable_sendNotificationToInbox,
-} from "./notifications/ldn";
 export {
   Url,
   Iri,

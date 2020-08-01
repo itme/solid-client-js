@@ -20,9 +20,9 @@
  */
 
 import { Quad, NamedNode } from "rdf-js";
-import { dataset, DataFactory } from "./rdfjs";
-import { turtleToTriples, triplesToTurtle } from "./formats/turtle";
-import { isLocalNode, resolveIriForLocalNodes } from "./datatypes";
+import { dataset, DataFactory } from "../rdfjs";
+import { turtleToTriples, triplesToTurtle } from "../formats/turtle";
+import { isLocalNode, resolveIriForLocalNodes } from "../datatypes";
 import {
   UrlString,
   LitDataset,
@@ -32,7 +32,9 @@ import {
   hasResourceInfo,
   LocalNode,
   unstable_WithAcl,
-} from "./interfaces";
+  Url,
+  internal_toIriString,
+} from "../interfaces";
 import {
   internal_parseResourceInfo,
   internal_defaultFetchOptions,
@@ -57,11 +59,12 @@ export function createLitDataset(): LitDataset {
  * @returns Promise resolving to a [[LitDataset]] containing the data at the given Resource, or rejecting if fetching it failed.
  */
 export async function fetchLitDataset(
-  url: UrlString,
+  url: UrlString | Url,
   options: Partial<
     typeof internal_defaultFetchOptions
   > = internal_defaultFetchOptions
 ): Promise<LitDataset & WithResourceInfo> {
+  url = internal_toIriString(url);
   const config = {
     ...internal_defaultFetchOptions,
     ...options,
@@ -80,8 +83,12 @@ export async function fetchLitDataset(
 
   const resourceInfo = internal_parseResourceInfo(response);
 
-  const resourceWithResourceInfo: LitDataset &
-    WithResourceInfo = Object.assign(resource, { resourceInfo: resourceInfo });
+  const resourceWithResourceInfo: LitDataset & WithResourceInfo = Object.assign(
+    resource,
+    {
+      internal_resourceInfo: resourceInfo,
+    }
+  );
 
   return resourceWithResourceInfo;
 }
@@ -106,14 +113,14 @@ export async function fetchLitDataset(
  * @returns A LitDataset and the ACLs that apply to it, if available to the authenticated user.
  */
 export async function unstable_fetchLitDatasetWithAcl(
-  url: UrlString,
+  url: UrlString | Url,
   options: Partial<
     typeof internal_defaultFetchOptions
   > = internal_defaultFetchOptions
 ): Promise<LitDataset & WithResourceInfo & unstable_WithAcl> {
   const litDataset = await fetchLitDataset(url, options);
   const acl = await internal_fetchAcl(litDataset, options);
-  return Object.assign(litDataset, { acl });
+  return Object.assign(litDataset, { internal_acl: acl });
 }
 
 /**
@@ -125,12 +132,13 @@ export async function unstable_fetchLitDatasetWithAcl(
  * @returns A Promise resolving to a [[LitDataset]] containing the stored data, or rejecting if saving it failed.
  */
 export async function saveLitDatasetAt(
-  url: UrlString,
+  url: UrlString | Url,
   litDataset: LitDataset,
   options: Partial<
     typeof internal_defaultFetchOptions
   > = internal_defaultFetchOptions
 ): Promise<LitDataset & WithResourceInfo & WithChangeLog> {
+  url = internal_toIriString(url);
   const config = {
     ...internal_defaultFetchOptions,
     ...options,
@@ -140,18 +148,22 @@ export async function saveLitDatasetAt(
 
   if (isUpdate(litDataset, url)) {
     const deleteStatement =
-      litDataset.changeLog.deletions.length > 0
+      litDataset.internal_changeLog.deletions.length > 0
         ? `DELETE DATA {${(
             await triplesToTurtle(
-              litDataset.changeLog.deletions.map(getNamedNodesForLocalNodes)
+              litDataset.internal_changeLog.deletions.map(
+                getNamedNodesForLocalNodes
+              )
             )
           ).trim()}};`
         : "";
     const insertStatement =
-      litDataset.changeLog.additions.length > 0
+      litDataset.internal_changeLog.additions.length > 0
         ? `INSERT DATA {${(
             await triplesToTurtle(
-              litDataset.changeLog.additions.map(getNamedNodesForLocalNodes)
+              litDataset.internal_changeLog.additions.map(
+                getNamedNodesForLocalNodes
+              )
             )
           ).trim()}};`
         : "";
@@ -185,16 +197,16 @@ export async function saveLitDatasetAt(
     );
   }
 
-  const resourceInfo: WithResourceInfo["resourceInfo"] = hasResourceInfo(
+  const resourceInfo: WithResourceInfo["internal_resourceInfo"] = hasResourceInfo(
     litDataset
   )
-    ? { ...litDataset.resourceInfo, fetchedFrom: url }
+    ? { ...litDataset.internal_resourceInfo, fetchedFrom: url }
     : { fetchedFrom: url, isLitDataset: true };
   const storedDataset: LitDataset &
     WithChangeLog &
     WithResourceInfo = Object.assign(litDataset, {
-    changeLog: { additions: [], deletions: [] },
-    resourceInfo: resourceInfo,
+    internal_changeLog: { additions: [], deletions: [] },
+    internal_resourceInfo: resourceInfo,
   });
 
   const storedDatasetWithResolvedIris = resolveLocalIrisInLitDataset(
@@ -213,8 +225,8 @@ function isUpdate(
   return (
     hasChangelog(litDataset) &&
     hasResourceInfo(litDataset) &&
-    typeof litDataset.resourceInfo.fetchedFrom === "string" &&
-    litDataset.resourceInfo.fetchedFrom === url
+    typeof litDataset.internal_resourceInfo.fetchedFrom === "string" &&
+    litDataset.internal_resourceInfo.fetchedFrom === url
   );
 }
 
@@ -232,7 +244,7 @@ type SaveInContainerOptions = Partial<
  * @returns A Promise resolving to a [[LitDataset]] containing the stored data linked to the new Resource, or rejecting if saving it failed.
  */
 export async function saveLitDatasetInContainer(
-  containerUrl: UrlString,
+  containerUrl: UrlString | Url,
   litDataset: LitDataset,
   options: SaveInContainerOptions = internal_defaultFetchOptions
 ): Promise<LitDataset & WithResourceInfo> {
@@ -240,6 +252,7 @@ export async function saveLitDatasetInContainer(
     ...internal_defaultFetchOptions,
     ...options,
   };
+  containerUrl = internal_toIriString(containerUrl);
 
   const rawTurtle = await triplesToTurtle(
     Array.from(litDataset).map(getNamedNodesForLocalNodes)
@@ -272,14 +285,14 @@ export async function saveLitDatasetInContainer(
 
   const resourceIri = new URL(locationHeader, new URL(containerUrl).origin)
     .href;
-  const resourceInfo: WithResourceInfo["resourceInfo"] = {
+  const resourceInfo: WithResourceInfo["internal_resourceInfo"] = {
     fetchedFrom: resourceIri,
     isLitDataset: true,
   };
   const resourceWithResourceInfo: LitDataset & WithResourceInfo = Object.assign(
     litDataset,
     {
-      resourceInfo: resourceInfo,
+      internal_resourceInfo: resourceInfo,
     }
   );
 
@@ -305,12 +318,8 @@ function getNamedNodesForLocalNodes(quad: Quad): Quad {
   };
 }
 
-/**
- * @internal
- * @param localNode
- */
 export function getNamedNodeFromLocalNode(localNode: LocalNode): NamedNode {
-  return DataFactory.namedNode("#" + localNode.name);
+  return DataFactory.namedNode("#" + localNode.internal_name);
 }
 
 function resolveLocalIrisInLitDataset<

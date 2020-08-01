@@ -4,10 +4,10 @@ title: Working with Files
 sidebar_label: Working with Files
 ---
 
-Even if the core Solid data model is **structured** data (see [Working with data](./working-with-data)), a Solid Pod
+Even if the core Solid data model is **structured** data (see [Working with data](./working-with-data.md)), a Solid Pod
 can also act as a regular general-purpose data store. Besides your profile document, your friend list and the likes, your
-Pod can also store your photos, PDFs and any other type of file. Note that the [access restrictions](./managing-access)
-apply to files the same way they apply to any other [Resource](../glossary#resource).
+Pod can also store your photos, PDFs and any other type of file. Note that the [access restrictions](./managing-access.md)
+apply to files the same way they apply to any other [Resource](../glossary.mdx#resource).
 
 Like anything else in your Pod, each file is a resource with a distinct URL, which may or may not contain a hint
 such as a `.jpg` extension for a photo. You'll find that the functions available to read and write files to/from
@@ -30,7 +30,7 @@ import {
   isLitDataset,
   getContentType,
   getFetchedFrom,
-} from "lit-solid";
+} from "@inrupt/solid-client";
 
 const file = await unstable_fetchFile(
   "https://example.com/some/interesting/file"
@@ -47,7 +47,7 @@ console.log(`The file is ${isLitDataset(file) ? "" : "not "}a dataset.`);
 Deleting a file is also a simple operation: you just erase the content available at a certain URL.
 
 ```typescript
-import { unstable_fetchFile } from "lit-solid";
+import { unstable_fetchFile } from "@inrupt/solid-client";
 
 const response = await unstable_deleteFile(
   "https://example.com/some/boring/file"
@@ -62,14 +62,14 @@ if (response.ok) {
 There are two approaches to writing files:
 
 1. you know exactly at which URL your file should be saved (potentially overwriting any data that sat there previously)
-2. you know what [Container](../glossary#container) should be the parent of your file, like saving it into a folder.
+2. you know what [Container](../glossary.mdx#container) should be the parent of your file, like saving it into a folder.
 
 ### Writing a file directly at a URL
 
 With this approach, if the request succeeds, you know exactly what the URL of your file is.
 
 ```typescript
-import { unstable_overwriteFile } from "lit-solid";
+import { unstable_overwriteFile } from "@inrupt/solid-client";
 
 const response = await unstable_overwriteFile(
   "https://example.com/some/new/file",
@@ -93,7 +93,7 @@ This means that you don't control the final name of your file though. To keep tr
 file, you'll have to look up the `Location` header in the response, as shown in the code snippet below:
 
 ```typescript
-import { unstable_saveFileInContainer } from "lit-solid";
+import { unstable_saveFileInContainer } from "@inrupt/solid-client";
 
 const response = await unstable_saveFileInContainer(
   "https://example.com/some/folder",
@@ -116,7 +116,7 @@ If you need to customize the request eventually sent to the server, you can do s
 header.
 
 ```typescript
-import { unstable_fetchFile } from "lit-solid";
+import { unstable_fetchFile } from "@inrupt/solid-client";
 
 const response = await unstable_deleteFile(
   "https://example.com/some/boring/file",

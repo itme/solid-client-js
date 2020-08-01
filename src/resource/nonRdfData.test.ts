@@ -21,7 +21,7 @@
 
 import { describe, it, expect } from "@jest/globals";
 
-jest.mock("./fetcher", () => ({
+jest.mock("../fetcher", () => ({
   fetch: jest
     .fn()
     .mockImplementation(() =>
@@ -42,7 +42,7 @@ import { Headers, Response } from "cross-fetch";
 
 describe("unstable_fetchFile", () => {
   it("should GET a remote resource using the included fetcher if no other fetcher is available", async () => {
-    const fetcher = jest.requireMock("./fetcher") as {
+    const fetcher = jest.requireMock("../fetcher") as {
       fetch: jest.Mock<
         ReturnType<typeof window.fetch>,
         [RequestInfo, RequestInit?]
@@ -90,9 +90,9 @@ describe("unstable_fetchFile", () => {
       fetch: mockFetch,
     });
 
-    expect(file.resourceInfo.fetchedFrom).toEqual("https://some.url");
-    expect(file.resourceInfo.contentType).toContain("text/plain");
-    expect(file.resourceInfo.isLitDataset).toEqual(false);
+    expect(file.internal_resourceInfo.fetchedFrom).toEqual("https://some.url");
+    expect(file.internal_resourceInfo.contentType).toContain("text/plain");
+    expect(file.internal_resourceInfo.isLitDataset).toEqual(false);
 
     const fileData = await file.text();
     expect(fileData).toEqual("Some data");
@@ -144,7 +144,7 @@ describe("unstable_fetchFile", () => {
 
 describe("unstable_fetchFileWithAcl", () => {
   it("should GET a remote resource using the included fetcher if no other fetcher is available", async () => {
-    const fetcher = jest.requireMock("./fetcher") as {
+    const fetcher = jest.requireMock("../fetcher") as {
       fetch: jest.Mock<
         ReturnType<typeof window.fetch>,
         [RequestInfo, RequestInit?]
@@ -192,9 +192,9 @@ describe("unstable_fetchFileWithAcl", () => {
       fetch: mockFetch,
     });
 
-    expect(file.resourceInfo.fetchedFrom).toEqual("https://some.url");
-    expect(file.resourceInfo.contentType).toContain("text/plain");
-    expect(file.resourceInfo.isLitDataset).toEqual(false);
+    expect(file.internal_resourceInfo.fetchedFrom).toEqual("https://some.url");
+    expect(file.internal_resourceInfo.contentType).toContain("text/plain");
+    expect(file.internal_resourceInfo.isLitDataset).toEqual(false);
 
     const fileData = await file.text();
     expect(fileData).toEqual("Some data");
@@ -220,15 +220,17 @@ describe("unstable_fetchFileWithAcl", () => {
       { fetch: mockFetch }
     );
 
-    expect(fetchedLitDataset.resourceInfo.fetchedFrom).toBe(
+    expect(fetchedLitDataset.internal_resourceInfo.fetchedFrom).toBe(
       "https://some.pod/resource"
     );
-    expect(fetchedLitDataset.acl?.resourceAcl?.resourceInfo.fetchedFrom).toBe(
-      "https://some.pod/resource.acl"
-    );
-    expect(fetchedLitDataset.acl?.fallbackAcl?.resourceInfo.fetchedFrom).toBe(
-      "https://some.pod/.acl"
-    );
+    expect(
+      fetchedLitDataset.internal_acl?.resourceAcl?.internal_resourceInfo
+        .fetchedFrom
+    ).toBe("https://some.pod/resource.acl");
+    expect(
+      fetchedLitDataset.internal_acl?.fallbackAcl?.internal_resourceInfo
+        .fetchedFrom
+    ).toBe("https://some.pod/.acl");
     expect(mockFetch.mock.calls).toHaveLength(4);
     expect(mockFetch.mock.calls[0][0]).toBe("https://some.pod/resource");
     expect(mockFetch.mock.calls[1][0]).toBe("https://some.pod/resource.acl");
@@ -254,8 +256,8 @@ describe("unstable_fetchFileWithAcl", () => {
     );
 
     expect(mockFetch.mock.calls).toHaveLength(1);
-    expect(fetchedLitDataset.acl.resourceAcl).toBeNull();
-    expect(fetchedLitDataset.acl.fallbackAcl).toBeNull();
+    expect(fetchedLitDataset.internal_acl.resourceAcl).toBeNull();
+    expect(fetchedLitDataset.internal_acl.fallbackAcl).toBeNull();
   });
 
   it("returns a meaningful error when the server returns a 403", async () => {
@@ -342,7 +344,7 @@ describe("unstable_fetchFileWithAcl", () => {
 
 describe("Non-RDF data deletion", () => {
   it("should DELETE a remote resource using the included fetcher if no other fetcher is available", async () => {
-    const fetcher = jest.requireMock("./fetcher") as {
+    const fetcher = jest.requireMock("../fetcher") as {
       fetch: jest.Mock<
         ReturnType<typeof window.fetch>,
         [RequestInfo, RequestInit?]
@@ -451,7 +453,7 @@ describe("Write non-RDF data into a folder", () => {
   } as Blob;
 
   it("should default to the included fetcher if no other is available", async () => {
-    const fetcher = jest.requireMock("./fetcher") as {
+    const fetcher = jest.requireMock("../fetcher") as {
       fetch: jest.Mock<
         ReturnType<typeof window.fetch>,
         [RequestInfo, RequestInit?]
@@ -473,7 +475,7 @@ describe("Write non-RDF data into a folder", () => {
   });
 
   it("should POST to a remote resource the included fetcher, and return the response", async () => {
-    const fetcher = jest.requireMock("./fetcher") as {
+    const fetcher = jest.requireMock("../fetcher") as {
       fetch: jest.Mock<
         ReturnType<typeof window.fetch>,
         [RequestInfo, RequestInit?]
@@ -611,7 +613,7 @@ describe("Write non-RDF data directly into a resource (potentially erasing previ
   } as Blob;
 
   it("should default to the included fetcher if no other fetcher is available", async () => {
-    const fetcher = jest.requireMock("./fetcher") as {
+    const fetcher = jest.requireMock("../fetcher") as {
       fetch: jest.Mock<
         ReturnType<typeof window.fetch>,
         [RequestInfo, RequestInit?]
@@ -630,7 +632,7 @@ describe("Write non-RDF data directly into a resource (potentially erasing previ
   });
 
   it("should PUT to a remote resource when using the included fetcher, and return the response", async () => {
-    const fetcher = jest.requireMock("./fetcher") as {
+    const fetcher = jest.requireMock("../fetcher") as {
       fetch: jest.Mock<
         ReturnType<typeof window.fetch>,
         [RequestInfo, RequestInit?]

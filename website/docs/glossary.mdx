@@ -13,7 +13,7 @@ For questions around the concepts and terminology specific to Solid, more info c
 
 ### Access
 
-See also the tutorial [Managing Access](./tutorials/managing-access).
+See also the tutorial [Managing Access](./tutorials/managing-access.md).
 
 #### Access Modes
 
@@ -44,15 +44,31 @@ to the applicable [Resource](#resource).
 #### ACL
 
 An **Access Control List**. For an overview of how they work in Solid, see
-[Managing Access](./tutorials/managing-access).
+[Managing Access](./tutorials/managing-access.md).
 
 #### Agent
 
 A term with which we typically mean a person, but which could also refer to e.g. bots.
 
+#### Default access
+
+[Access](#access) rules that apply not to the [Container](#container) Resource directly, but recursively to its
+children, their children if applicable, so on and so forth.
+
+#### Fallback ACL
+
+If a Resource does not have [an ACL that applies to it directly](#resource-acl), the fallback ACL is
+the ACL of the Container closest to that Resource that has its own Resource ACL. Only the [default
+access](#default-access) rules in the fallback ACL apply.
+
+#### Resource ACL
+
+The [ACL](#acl) that applies to a given Resource. If none exists, the [fallback ACL](#fallback-acl)
+applies.
+
 ### Data
 
-See also the tutorial [Working with Data](./tutorials/working-with-data).
+See also the tutorial [Working with Data](./tutorials/working-with-data.md).
 
 #### Container
 
@@ -65,7 +81,7 @@ and <NoWrap>`https://cleopatra.solid.community/`</NoWrap> are Containers.
 
 #### LitDataset
 
-A [`LitDataset`](./api/modules/_interfaces_#litdataset) represents all the [Things](#thing) that are
+A [`LitDataset`](./api/modules/_interfaces_.md#litdataset) represents all the [Things](#thing) that are
 (to be) stored in a specific [Resource](#resource).
 
 #### Resource
@@ -74,7 +90,7 @@ The thing that's sent to you when you type a URL into a web browser.
 
 #### Thing
 
-A [`Thing`](./api/modules/_interfaces_#thing) is a set of data about a single thing. For example, a
+A [`Thing`](./api/modules/_interfaces_.md#thing) is a set of data about a single thing. For example, a
 Thing about yours truly could include the fact that my name is "Vincent".
 
 #### WebID

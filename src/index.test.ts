@@ -98,6 +98,7 @@ import {
   unstable_getFallbackAcl,
   unstable_hasResourceAcl,
   unstable_getResourceAcl,
+  unstable_createAcl,
   unstable_createAclFromFallbackAcl,
   unstable_getAgentAccessOne,
   unstable_getAgentAccessAll,
@@ -128,11 +129,6 @@ import {
   addStringInLocale,
   setStringInLocale,
   removeStringInLocale,
-  unstable_discoverInbox,
-  unstable_fetchInbox,
-  unstable_buildNotification,
-  unstable_sendNotification,
-  unstable_sendNotificationToInbox,
 } from "./index";
 
 // These tests aren't too useful in preventing bugs, but they work around this issue:
@@ -216,6 +212,7 @@ it("exports the public API from the entry file", () => {
   expect(unstable_getFallbackAcl).toBeDefined();
   expect(unstable_hasResourceAcl).toBeDefined();
   expect(unstable_getResourceAcl).toBeDefined();
+  expect(unstable_createAcl).toBeDefined();
   expect(unstable_createAclFromFallbackAcl).toBeDefined();
   expect(unstable_getAgentAccessOne).toBeDefined();
   expect(unstable_getAgentAccessAll).toBeDefined();
@@ -235,11 +232,6 @@ it("exports the public API from the entry file", () => {
   expect(unstable_getGroupResourceAccessAll).toBeDefined();
   expect(unstable_getGroupDefaultAccessOne).toBeDefined();
   expect(unstable_getGroupDefaultAccessAll).toBeDefined();
-  expect(unstable_discoverInbox).toBeDefined(),
-    expect(unstable_fetchInbox).toBeDefined();
-  expect(unstable_buildNotification).toBeDefined();
-  expect(unstable_sendNotification).toBeDefined();
-  expect(unstable_sendNotificationToInbox).toBeDefined();
 });
 
 it("still exports deprecated methods", () => {

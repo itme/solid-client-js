@@ -20,7 +20,7 @@
  */
 
 import { describe, it, expect } from "@jest/globals";
-jest.mock("./fetcher.ts", () => ({
+jest.mock("../fetcher.ts", () => ({
   fetch: jest.fn().mockImplementation(() =>
     Promise.resolve(
       new Response(undefined, {
@@ -47,6 +47,9 @@ import {
   unstable_getFallbackAcl,
   internal_removeEmptyAclRules,
   unstable_createAclFromFallbackAcl,
+  unstable_saveAclFor,
+  unstable_deleteAclFor,
+  unstable_createAcl,
 } from "./acl";
 import {
   WithResourceInfo,
@@ -54,7 +57,8 @@ import {
   unstable_AclRule,
   unstable_AclDataset,
   unstable_Access,
-} from "./interfaces";
+  unstable_WithAccessibleAcl,
+} from "../interfaces";
 
 function mockResponse(
   body?: BodyInit | null,
@@ -66,7 +70,7 @@ function mockResponse(
 describe("fetchResourceAcl", () => {
   it("returns the fetched ACL LitDataset", async () => {
     const sourceDataset: WithResourceInfo = {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://some.pod/resource",
         isLitDataset: true,
         unstable_aclUrl: "https://some.pod/resource.acl",
@@ -84,8 +88,8 @@ describe("fetchResourceAcl", () => {
       fetch: mockFetch,
     });
 
-    expect(fetchedAcl?.accessTo).toBe("https://some.pod/resource");
-    expect(fetchedAcl?.resourceInfo.fetchedFrom).toBe(
+    expect(fetchedAcl?.internal_accessTo).toBe("https://some.pod/resource");
+    expect(fetchedAcl?.internal_resourceInfo.fetchedFrom).toBe(
       "https://some.pod/resource.acl"
     );
     expect(mockFetch.mock.calls).toHaveLength(1);
@@ -94,13 +98,13 @@ describe("fetchResourceAcl", () => {
 
   it("calls the included fetcher by default", async () => {
     const sourceDataset: WithResourceInfo = {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://some.pod/resource",
         isLitDataset: true,
         unstable_aclUrl: "https://some.pod/resource.acl",
       },
     };
-    const mockedFetcher = jest.requireMock("./fetcher.ts") as {
+    const mockedFetcher = jest.requireMock("../fetcher.ts") as {
       fetch: jest.Mock<
         ReturnType<typeof window.fetch>,
         [RequestInfo, RequestInit?]
@@ -116,7 +120,7 @@ describe("fetchResourceAcl", () => {
 
   it("returns null if the source LitDataset has no known ACL IRI", async () => {
     const sourceDataset: WithResourceInfo = {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource",
         isLitDataset: true,
       },
@@ -129,7 +133,7 @@ describe("fetchResourceAcl", () => {
 
   it("returns null if the ACL was not found", async () => {
     const sourceDataset: WithResourceInfo = {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource",
         isLitDataset: true,
         unstable_aclUrl: "https://some.pod/resource.acl",
@@ -157,7 +161,7 @@ describe("fetchResourceAcl", () => {
 describe("fetchFallbackAcl", () => {
   it("returns the parent Container's ACL LitDataset, if present", async () => {
     const sourceDataset = {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://some.pod/resource",
         isLitDataset: true,
         // If no ACL IRI is given, the user does not have Control Access,
@@ -184,8 +188,10 @@ describe("fetchFallbackAcl", () => {
       fetch: mockFetch,
     });
 
-    expect(fetchedAcl?.accessTo).toBe("https://some.pod/");
-    expect(fetchedAcl?.resourceInfo.fetchedFrom).toBe("https://some.pod/.acl");
+    expect(fetchedAcl?.internal_accessTo).toBe("https://some.pod/");
+    expect(fetchedAcl?.internal_resourceInfo.fetchedFrom).toBe(
+      "https://some.pod/.acl"
+    );
     expect(mockFetch.mock.calls).toHaveLength(2);
     expect(mockFetch.mock.calls[0][0]).toBe("https://some.pod/");
     expect(mockFetch.mock.calls[1][0]).toBe("https://some.pod/.acl");
@@ -193,13 +199,13 @@ describe("fetchFallbackAcl", () => {
 
   it("calls the included fetcher by default", async () => {
     const sourceDataset = {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://some.pod/resource",
         isLitDataset: true,
         unstable_aclUrl: "https://some.pod/resource.acl",
       },
     };
-    const mockedFetcher = jest.requireMock("./fetcher.ts") as {
+    const mockedFetcher = jest.requireMock("../fetcher.ts") as {
       fetch: jest.Mock<
         ReturnType<typeof window.fetch>,
         [RequestInfo, RequestInit?]
@@ -214,7 +220,7 @@ describe("fetchFallbackAcl", () => {
 
   it("travels up multiple levels if no ACL was found on the levels in between", async () => {
     const sourceDataset = {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://some.pod/with-acl/without-acl/resource",
         isLitDataset: true,
         // If no ACL IRI is given, the user does not have Control Access,
@@ -262,8 +268,8 @@ describe("fetchFallbackAcl", () => {
       fetch: mockFetch,
     });
 
-    expect(fetchedAcl?.accessTo).toBe("https://some.pod/with-acl/");
-    expect(fetchedAcl?.resourceInfo.fetchedFrom).toBe(
+    expect(fetchedAcl?.internal_accessTo).toBe("https://some.pod/with-acl/");
+    expect(fetchedAcl?.internal_resourceInfo.fetchedFrom).toBe(
       "https://some.pod/with-acl/.acl"
     );
     expect(mockFetch.mock.calls).toHaveLength(4);
@@ -281,7 +287,7 @@ describe("fetchFallbackAcl", () => {
   // not be able to determine the effective ACL:
   it("returns null if one of the Containers on the way up does not advertise an ACL", async () => {
     const sourceDataset = {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom:
           "https://some.pod/arbitrary-parent/no-control-access/resource",
         isLitDataset: true,
@@ -313,7 +319,7 @@ describe("fetchFallbackAcl", () => {
 
   it("returns null if no ACL could be found for the Containers up to the root of the Pod", async () => {
     const sourceDataset = {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://some.pod/resource",
         isLitDataset: true,
         // If no ACL IRI is given, the user does not have Control Access,
@@ -356,15 +362,15 @@ describe("fetchFallbackAcl", () => {
 describe("getResourceAcl", () => {
   it("returns the attached Resource ACL Dataset", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      accessTo: "https://arbitrary.pod/resource",
-      resourceInfo: {
+      internal_accessTo: "https://arbitrary.pod/resource",
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource.acl",
         isLitDataset: true,
       },
     });
     const litDataset = Object.assign(dataset(), {
-      acl: { resourceAcl: aclDataset, fallbackAcl: null },
-      resourceInfo: {
+      internal_acl: { resourceAcl: aclDataset, fallbackAcl: null },
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource",
         isLitDataset: true,
         unstable_aclUrl: "https://arbitrary.pod/resource.acl",
@@ -375,15 +381,15 @@ describe("getResourceAcl", () => {
 
   it("returns null if the given Resource does not consider the attached ACL to pertain to it", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      accessTo: "https://arbitrary.pod/resource",
-      resourceInfo: {
+      internal_accessTo: "https://arbitrary.pod/resource",
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource.acl",
         isLitDataset: true,
       },
     });
     const litDataset = Object.assign(dataset(), {
-      acl: { resourceAcl: aclDataset, fallbackAcl: null },
-      resourceInfo: {
+      internal_acl: { resourceAcl: aclDataset, fallbackAcl: null },
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource",
         isLitDataset: true,
         unsafe_aclUrl: "https://arbitrary.pod/other-resource.acl",
@@ -394,15 +400,15 @@ describe("getResourceAcl", () => {
 
   it("returns null if the attached ACL does not pertain to the given Resource", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      accessTo: "https://arbitrary.pod/other-resource",
-      resourceInfo: {
+      internal_accessTo: "https://arbitrary.pod/other-resource",
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource.acl",
         isLitDataset: true,
       },
     });
     const litDataset = Object.assign(dataset(), {
-      acl: { resourceAcl: aclDataset, fallbackAcl: null },
-      resourceInfo: {
+      internal_acl: { resourceAcl: aclDataset, fallbackAcl: null },
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource",
         isLitDataset: true,
         unsafe_aclUrl: "https://arbitrary.pod/resource.acl",
@@ -413,8 +419,8 @@ describe("getResourceAcl", () => {
 
   it("returns null if the given LitDataset does not have a Resource ACL attached", () => {
     const litDataset = Object.assign(dataset(), {
-      acl: { fallbackAcl: null, resourceAcl: null },
-      resourceInfo: {
+      internal_acl: { fallbackAcl: null, resourceAcl: null },
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource",
         isLitDataset: true,
       },
@@ -426,31 +432,55 @@ describe("getResourceAcl", () => {
 describe("getFallbackAcl", () => {
   it("returns the attached Fallback ACL Dataset", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      accessTo: "https://arbitrary.pod/",
-      resourceInfo: {
+      internal_accessTo: "https://arbitrary.pod/",
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/.acl",
         isLitDataset: true,
       },
     });
     const litDataset = Object.assign(dataset(), {
-      acl: { fallbackAcl: aclDataset, resourceAcl: null },
+      internal_acl: { fallbackAcl: aclDataset, resourceAcl: null },
     });
     expect(unstable_getFallbackAcl(litDataset)).toEqual(aclDataset);
   });
 
   it("returns null if the given LitDataset does not have a Fallback ACL attached", () => {
     const litDataset = Object.assign(dataset(), {
-      acl: { fallbackAcl: null, resourceAcl: null },
+      internal_acl: { fallbackAcl: null, resourceAcl: null },
     });
     expect(unstable_getFallbackAcl(litDataset)).toBeNull();
+  });
+});
+
+describe("createAcl", () => {
+  it("creates a new empty ACL", () => {
+    const litDataset = Object.assign(dataset(), {
+      internal_resourceInfo: {
+        fetchedFrom: "https://some.pod/container/resource",
+        isLitDataset: true,
+        unstable_aclUrl: "https://some.pod/container/resource.acl",
+      },
+      internal_acl: { fallbackAcl: null, resourceAcl: null },
+    });
+
+    const resourceAcl = unstable_createAcl(litDataset);
+
+    const resourceAclQuads = Array.from(resourceAcl);
+    expect(resourceAclQuads).toHaveLength(0);
+    expect(resourceAcl.internal_accessTo).toBe(
+      "https://some.pod/container/resource"
+    );
+    expect(resourceAcl.internal_resourceInfo.fetchedFrom).toBe(
+      "https://some.pod/container/resource.acl"
+    );
   });
 });
 
 describe("createAclFromFallbackAcl", () => {
   it("creates a new ACL including existing default rules as Resource rules", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      accessTo: "https://arbitrary.pod/container/",
-      resourceInfo: {
+      internal_accessTo: "https://arbitrary.pod/container/",
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/container/.acl",
         isLitDataset: true,
       },
@@ -487,12 +517,12 @@ describe("createAclFromFallbackAcl", () => {
       )
     );
     const litDataset = Object.assign(dataset(), {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/container/resource",
         isLitDataset: true,
         unstable_aclUrl: "https://arbitrary.pod/container/resource.acl",
       },
-      acl: { fallbackAcl: aclDataset, resourceAcl: null },
+      internal_acl: { fallbackAcl: aclDataset, resourceAcl: null },
     });
 
     const resourceAcl = unstable_createAclFromFallbackAcl(litDataset);
@@ -505,18 +535,18 @@ describe("createAclFromFallbackAcl", () => {
     expect(resourceAclQuads[3].object.value).toBe(
       "https://arbitrary.pod/container/resource"
     );
-    expect(resourceAcl.accessTo).toBe(
+    expect(resourceAcl.internal_accessTo).toBe(
       "https://arbitrary.pod/container/resource"
     );
-    expect(resourceAcl.resourceInfo.fetchedFrom).toBe(
+    expect(resourceAcl.internal_resourceInfo.fetchedFrom).toBe(
       "https://arbitrary.pod/container/resource.acl"
     );
   });
 
   it("does not copy over Resource rules from the fallback ACL", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      accessTo: "https://arbitrary.pod/container/",
-      resourceInfo: {
+      internal_accessTo: "https://arbitrary.pod/container/",
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/container/.acl",
         isLitDataset: true,
       },
@@ -553,12 +583,12 @@ describe("createAclFromFallbackAcl", () => {
       )
     );
     const litDataset = Object.assign(dataset(), {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/container/resource",
         isLitDataset: true,
         unstable_aclUrl: "https://arbitrary.pod/container/resource.acl",
       },
-      acl: { fallbackAcl: aclDataset, resourceAcl: null },
+      internal_acl: { fallbackAcl: aclDataset, resourceAcl: null },
     });
 
     const resourceAcl = unstable_createAclFromFallbackAcl(litDataset);
@@ -571,11 +601,11 @@ describe("createAclFromFallbackAcl", () => {
 describe("getAclRules", () => {
   it("only returns Things that represent ACL Rules", () => {
     const aclDataset = Object.assign(dataset(), {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource.acl",
         isLitDataset: true,
       },
-      accessTo: "https://arbitrary.pod/resource",
+      internal_accessTo: "https://arbitrary.pod/resource",
     });
 
     aclDataset.add(
@@ -654,17 +684,19 @@ describe("getAclRules", () => {
     const rules = internal_getAclRules(aclDataset);
 
     expect(rules).toHaveLength(2);
-    expect((rules[0] as ThingPersisted).url).toBe(agentClassRuleSubjectIri);
-    expect((rules[1] as ThingPersisted).url).toBe(agentRuleSubjectIri);
+    expect((rules[0] as ThingPersisted).internal_url).toBe(
+      agentClassRuleSubjectIri
+    );
+    expect((rules[1] as ThingPersisted).internal_url).toBe(agentRuleSubjectIri);
   });
 
   it("returns Things with multiple `rdf:type`s, as long as at least on type is `acl:Authorization`", () => {
     const aclDataset = Object.assign(dataset(), {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource.acl",
         isLitDataset: true,
       },
-      accessTo: "https://arbitrary.pod/resource",
+      internal_accessTo: "https://arbitrary.pod/resource",
     });
 
     const ruleWithMultipleTypesSubjectIri =
@@ -712,7 +744,7 @@ describe("getAclRules", () => {
     const rules = internal_getAclRules(aclDataset);
 
     expect(rules).toHaveLength(1);
-    expect((rules[0] as ThingPersisted).url).toBe(
+    expect((rules[0] as ThingPersisted).internal_url).toBe(
       ruleWithMultipleTypesSubjectIri
     );
   });
@@ -721,7 +753,7 @@ describe("getAclRules", () => {
 describe("getResourceAclRules", () => {
   it("only returns ACL Rules that apply to a Resource", () => {
     const resourceAclRule1: unstable_AclRule = Object.assign(dataset(), {
-      url: "https://arbitrary.pod/resource.acl#rule1",
+      internal_url: "https://arbitrary.pod/resource.acl#rule1",
     });
     resourceAclRule1.add(
       DataFactory.quad(
@@ -732,7 +764,7 @@ describe("getResourceAclRules", () => {
     );
 
     const defaultAclRule1: unstable_AclRule = Object.assign(dataset(), {
-      url: "https://arbitrary.pod/container/.acl#rule2",
+      internal_url: "https://arbitrary.pod/container/.acl#rule2",
     });
     defaultAclRule1.add(
       DataFactory.quad(
@@ -743,7 +775,7 @@ describe("getResourceAclRules", () => {
     );
 
     const resourceAclRule2: unstable_AclRule = Object.assign(dataset(), {
-      url: "https://arbitrary.pod/resource.acl#rule3",
+      internal_url: "https://arbitrary.pod/resource.acl#rule3",
     });
     resourceAclRule2.add(
       DataFactory.quad(
@@ -754,7 +786,7 @@ describe("getResourceAclRules", () => {
     );
 
     const defaultAclRule2: unstable_AclRule = Object.assign(dataset(), {
-      url: "https://arbitrary.pod/container/.acl#rule4",
+      internal_url: "https://arbitrary.pod/container/.acl#rule4",
     });
     defaultAclRule2.add(
       DataFactory.quad(
@@ -780,7 +812,7 @@ describe("getResourceAclRules", () => {
 describe("getResourceAclRulesForResource", () => {
   it("only returns ACL Rules that apply to a given Resource", () => {
     const targetResourceAclRule: unstable_AclRule = Object.assign(dataset(), {
-      url: "https://arbitrary.pod/resource.acl#rule1",
+      internal_url: "https://arbitrary.pod/resource.acl#rule1",
     });
     targetResourceAclRule.add(
       DataFactory.quad(
@@ -791,7 +823,7 @@ describe("getResourceAclRulesForResource", () => {
     );
 
     const defaultAclRule: unstable_AclRule = Object.assign(dataset(), {
-      url: "https://arbitrary.pod/container/.acl#rule2",
+      internal_url: "https://arbitrary.pod/container/.acl#rule2",
     });
     defaultAclRule.add(
       DataFactory.quad(
@@ -802,7 +834,7 @@ describe("getResourceAclRulesForResource", () => {
     );
 
     const otherResourceAclRule: unstable_AclRule = Object.assign(dataset(), {
-      url: "https://arbitrary.pod/resource.acl#rule3",
+      internal_url: "https://arbitrary.pod/resource.acl#rule3",
     });
     otherResourceAclRule.add(
       DataFactory.quad(
@@ -830,7 +862,7 @@ describe("getResourceAclRulesForResource", () => {
 describe("getDefaultAclRules", () => {
   it("only returns ACL Rules that are the default for a Container", () => {
     const resourceAclRule1: unstable_AclRule = Object.assign(dataset(), {
-      url: "https://arbitrary.pod/resource.acl#rule1",
+      internal_url: "https://arbitrary.pod/resource.acl#rule1",
     });
     resourceAclRule1.add(
       DataFactory.quad(
@@ -841,7 +873,7 @@ describe("getDefaultAclRules", () => {
     );
 
     const defaultAclRule1: unstable_AclRule = Object.assign(dataset(), {
-      url: "https://arbitrary.pod/container/.acl#rule2",
+      internal_url: "https://arbitrary.pod/container/.acl#rule2",
     });
     defaultAclRule1.add(
       DataFactory.quad(
@@ -852,7 +884,7 @@ describe("getDefaultAclRules", () => {
     );
 
     const resourceAclRule2: unstable_AclRule = Object.assign(dataset(), {
-      url: "https://arbitrary.pod/resource.acl#rule3",
+      internal_url: "https://arbitrary.pod/resource.acl#rule3",
     });
     resourceAclRule2.add(
       DataFactory.quad(
@@ -863,7 +895,7 @@ describe("getDefaultAclRules", () => {
     );
 
     const defaultAclRule2: unstable_AclRule = Object.assign(dataset(), {
-      url: "https://arbitrary.pod/container/.acl#rule4",
+      internal_url: "https://arbitrary.pod/container/.acl#rule4",
     });
     defaultAclRule2.add(
       DataFactory.quad(
@@ -889,7 +921,7 @@ describe("getDefaultAclRules", () => {
 describe("getDefaultAclRulesForResource", () => {
   it("only returns ACL Rules that are the default for children of a given Container", () => {
     const resourceAclRule: unstable_AclRule = Object.assign(dataset(), {
-      url: "https://arbitrary.pod/resource.acl#rule1",
+      internal_url: "https://arbitrary.pod/resource.acl#rule1",
     });
     resourceAclRule.add(
       DataFactory.quad(
@@ -900,7 +932,7 @@ describe("getDefaultAclRulesForResource", () => {
     );
 
     const targetDefaultAclRule: unstable_AclRule = Object.assign(dataset(), {
-      url: "https://arbitrary.pod/container/.acl#rule2",
+      internal_url: "https://arbitrary.pod/container/.acl#rule2",
     });
     targetDefaultAclRule.add(
       DataFactory.quad(
@@ -911,7 +943,7 @@ describe("getDefaultAclRulesForResource", () => {
     );
 
     const otherDefaultAclRule: unstable_AclRule = Object.assign(dataset(), {
-      url: "https://arbitrary.pod/container/.acl#rule3",
+      internal_url: "https://arbitrary.pod/container/.acl#rule3",
     });
     otherDefaultAclRule.add(
       DataFactory.quad(
@@ -940,7 +972,7 @@ describe("getAccess", () => {
   it("returns true for Access Modes that are granted", () => {
     const subject = "https://arbitrary.pod/profileDoc#webId";
 
-    const mockRule = Object.assign(dataset(), { url: subject });
+    const mockRule = Object.assign(dataset(), { internal_url: subject });
     mockRule.add(
       DataFactory.quad(
         DataFactory.namedNode(subject),
@@ -981,7 +1013,7 @@ describe("getAccess", () => {
   it("returns false for undefined Access Modes", () => {
     const subject = "https://arbitrary.pod/profileDoc#webId";
 
-    const mockRule = Object.assign(dataset(), { url: subject });
+    const mockRule = Object.assign(dataset(), { internal_url: subject });
 
     expect(internal_getAccess(mockRule)).toEqual({
       read: false,
@@ -994,7 +1026,7 @@ describe("getAccess", () => {
   it("infers Append access from Write access", () => {
     const subject = "https://arbitrary.pod/profileDoc#webId";
 
-    const mockRule = Object.assign(dataset(), { url: subject });
+    const mockRule = Object.assign(dataset(), { internal_url: subject });
     mockRule.add(
       DataFactory.quad(
         DataFactory.namedNode(subject),
@@ -1072,11 +1104,11 @@ describe("combineAccessModes", () => {
 describe("removeEmptyAclRules", () => {
   it("removes rules that do not apply to anyone", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource.acl",
         isLitDataset: true,
       },
-      accessTo: "https://arbitrary.pod/resource",
+      internal_accessTo: "https://arbitrary.pod/resource",
     });
     const subjectIri = "https://arbitrary.pod/resource.acl#emptyRule";
     aclDataset.add(
@@ -1110,11 +1142,11 @@ describe("removeEmptyAclRules", () => {
 
   it("does not modify the input LitDataset", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource.acl",
         isLitDataset: true,
       },
-      accessTo: "https://arbitrary.pod/resource",
+      internal_accessTo: "https://arbitrary.pod/resource",
     });
     const subjectIri = "https://arbitrary.pod/resource.acl#emptyRule";
     aclDataset.add(
@@ -1149,11 +1181,11 @@ describe("removeEmptyAclRules", () => {
 
   it("removes rules that do not set any Access Modes", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource.acl",
         isLitDataset: true,
       },
-      accessTo: "https://arbitrary.pod/resource",
+      internal_accessTo: "https://arbitrary.pod/resource",
     });
     const subjectIri = "https://arbitrary.pod/resource.acl#emptyRule";
     aclDataset.add(
@@ -1187,11 +1219,11 @@ describe("removeEmptyAclRules", () => {
 
   it("removes rules that do not have target Resources to which they apply", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource.acl",
         isLitDataset: true,
       },
-      accessTo: "https://arbitrary.pod/resource",
+      internal_accessTo: "https://arbitrary.pod/resource",
     });
     const subjectIri = "https://arbitrary.pod/resource.acl#emptyRule";
     aclDataset.add(
@@ -1225,11 +1257,11 @@ describe("removeEmptyAclRules", () => {
 
   it("removes rules that specify an acl:origin but not in combination with an Agent, Agent Group or Agent Class", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource.acl",
         isLitDataset: true,
       },
-      accessTo: "https://arbitrary.pod/resource",
+      internal_accessTo: "https://arbitrary.pod/resource",
     });
     const subjectIri = "https://arbitrary.pod/resource.acl#emptyRule";
     aclDataset.add(
@@ -1270,11 +1302,11 @@ describe("removeEmptyAclRules", () => {
 
   it("does not remove Rules that are also something other than an ACL Rule", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource.acl",
         isLitDataset: true,
       },
-      accessTo: "https://arbitrary.pod/resource",
+      internal_accessTo: "https://arbitrary.pod/resource",
     });
     const subjectIri = "https://arbitrary.pod/resource.acl#rule";
     aclDataset.add(
@@ -1324,11 +1356,11 @@ describe("removeEmptyAclRules", () => {
 
   it("does not remove Things that are Rules but also have other Quads", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource.acl",
         isLitDataset: true,
       },
-      accessTo: "https://arbitrary.pod/resource",
+      internal_accessTo: "https://arbitrary.pod/resource",
     });
     const subjectIri = "https://arbitrary.pod/resource.acl#rule";
     aclDataset.add(
@@ -1376,11 +1408,11 @@ describe("removeEmptyAclRules", () => {
 
   it("does not remove Rules that apply to a Container's child Resources", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/container/.acl",
         isLitDataset: true,
       },
-      accessTo: "https://arbitrary.pod/container/",
+      internal_accessTo: "https://arbitrary.pod/container/",
     });
     const subjectIri = "https://arbitrary.pod/container/.acl#rule";
     aclDataset.add(
@@ -1421,11 +1453,11 @@ describe("removeEmptyAclRules", () => {
 
   it("does not remove Rules that apply to an Agent", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource.acl",
         isLitDataset: true,
       },
-      accessTo: "https://arbitrary.pod/resource",
+      internal_accessTo: "https://arbitrary.pod/resource",
     });
     const subjectIri = "https://arbitrary.pod/resource.acl#rule";
     aclDataset.add(
@@ -1466,11 +1498,11 @@ describe("removeEmptyAclRules", () => {
 
   it("does not remove Rules that apply to an Agent Group", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource.acl",
         isLitDataset: true,
       },
-      accessTo: "https://arbitrary.pod/resource",
+      internal_accessTo: "https://arbitrary.pod/resource",
     });
     const subjectIri = "https://arbitrary.pod/resource.acl#rule";
     aclDataset.add(
@@ -1511,11 +1543,11 @@ describe("removeEmptyAclRules", () => {
 
   it("does not remove Rules that apply to an Agent Class", () => {
     const aclDataset: unstable_AclDataset = Object.assign(dataset(), {
-      resourceInfo: {
+      internal_resourceInfo: {
         fetchedFrom: "https://arbitrary.pod/resource.acl",
         isLitDataset: true,
       },
-      accessTo: "https://arbitrary.pod/resource",
+      internal_accessTo: "https://arbitrary.pod/resource",
     });
     const subjectIri = "https://arbitrary.pod/resource.acl#rule";
     aclDataset.add(
@@ -1552,5 +1584,298 @@ describe("removeEmptyAclRules", () => {
     const updatedDataset = internal_removeEmptyAclRules(aclDataset);
 
     expect(Array.from(updatedDataset)).toEqual(Array.from(aclDataset));
+  });
+});
+
+describe("saveAclFor", () => {
+  it("calls the included fetcher by default", async () => {
+    const mockedFetcher = jest.requireMock("../fetcher.ts") as {
+      fetch: jest.Mock<
+        ReturnType<typeof window.fetch>,
+        [RequestInfo, RequestInit?]
+      >;
+    };
+    const withResourceInfo = {
+      internal_resourceInfo: {
+        fetchedFrom: "https://arbitrary.pod/resource",
+        isLitDataset: true,
+        unstable_aclUrl: "https://arbitrary.pod/resource.acl",
+      },
+    };
+    const aclResource: unstable_AclDataset = Object.assign(dataset(), {
+      internal_resourceInfo: {
+        fetchedFrom: "https://arbitrary.pod/resource.acl",
+        isLitDataset: true,
+      },
+      internal_accessTo: "https://arbitrary.pod/resource",
+    });
+
+    await unstable_saveAclFor(withResourceInfo, aclResource);
+
+    expect(mockedFetcher.fetch.mock.calls).toHaveLength(1);
+  });
+
+  it("uses the given fetcher if provided", async () => {
+    const mockFetch = jest
+      .fn(window.fetch)
+      .mockReturnValue(Promise.resolve(new Response()));
+    const withResourceInfo = {
+      internal_resourceInfo: {
+        fetchedFrom: "https://arbitrary.pod/resource",
+        isLitDataset: true,
+        unstable_aclUrl: "https://arbitrary.pod/resource.acl",
+      },
+    };
+    const aclResource: unstable_AclDataset = Object.assign(dataset(), {
+      internal_resourceInfo: {
+        fetchedFrom: "https://arbitrary.pod/resource.acl",
+        isLitDataset: true,
+      },
+      internal_accessTo: "https://arbitrary.pod/resource",
+    });
+
+    await unstable_saveAclFor(withResourceInfo, aclResource, {
+      fetch: mockFetch,
+    });
+
+    expect(mockFetch.mock.calls).toHaveLength(1);
+  });
+
+  it("returns a meaningful error when the server returns a 403", async () => {
+    const mockFetch = jest
+      .fn(window.fetch)
+      .mockReturnValue(
+        Promise.resolve(new Response("Not allowed", { status: 403 }))
+      );
+    const withResourceInfo = {
+      internal_resourceInfo: {
+        fetchedFrom: "https://arbitrary.pod/resource",
+        isLitDataset: true,
+        unstable_aclUrl: "https://arbitrary.pod/resource.acl",
+      },
+    };
+    const aclResource: unstable_AclDataset = Object.assign(dataset(), {
+      internal_resourceInfo: {
+        fetchedFrom: "https://arbitrary.pod/resource.acl",
+        isLitDataset: true,
+      },
+      internal_accessTo: "https://arbitrary.pod/resource",
+    });
+
+    const fetchPromise = unstable_saveAclFor(withResourceInfo, aclResource, {
+      fetch: mockFetch,
+    });
+
+    await expect(fetchPromise).rejects.toThrow(
+      new Error("Storing the Resource failed: 403 Forbidden.")
+    );
+  });
+
+  it("marks the stored ACL as applying to the given Resource", async () => {
+    const mockFetch = jest
+      .fn(window.fetch)
+      .mockReturnValue(Promise.resolve(new Response()));
+    const withResourceInfo = {
+      internal_resourceInfo: {
+        fetchedFrom: "https://some.pod/resource",
+        isLitDataset: true,
+        unstable_aclUrl: "https://arbitrary.pod/resource.acl",
+      },
+    };
+    const aclResource: unstable_AclDataset = Object.assign(dataset(), {
+      internal_resourceInfo: {
+        fetchedFrom: "https://arbitrary.pod/resource.acl",
+        isLitDataset: true,
+      },
+      internal_accessTo: "https://some-other.pod/resource",
+    });
+
+    const savedAcl = await unstable_saveAclFor(withResourceInfo, aclResource, {
+      fetch: mockFetch,
+    });
+
+    expect(savedAcl.internal_accessTo).toBe("https://some.pod/resource");
+  });
+
+  it("sends a PATCH if the ACL contains a ChangeLog and was originally fetched from the same location", async () => {
+    const mockFetch = jest
+      .fn(window.fetch)
+      .mockReturnValue(Promise.resolve(new Response()));
+    const withResourceInfo = {
+      internal_resourceInfo: {
+        fetchedFrom: "https://arbitrary.pod/resource",
+        isLitDataset: true,
+        unstable_aclUrl: "https://arbitrary.pod/resource.acl",
+      },
+    };
+    const aclResource: unstable_AclDataset = Object.assign(dataset(), {
+      internal_resourceInfo: {
+        fetchedFrom: "https://arbitrary.pod/resource.acl",
+        isLitDataset: true,
+      },
+      internal_accessTo: "https://arbitrary.pod/resource",
+      internal_changeLog: {
+        additions: [],
+        deletions: [],
+      },
+    });
+
+    await unstable_saveAclFor(withResourceInfo, aclResource, {
+      fetch: mockFetch,
+    });
+
+    expect(mockFetch.mock.calls[0][1]?.method).toBe("PATCH");
+  });
+
+  it("sends a PUT if the ACL contains a ChangeLog but was originally fetched from a different location", async () => {
+    const mockFetch = jest
+      .fn(window.fetch)
+      .mockReturnValue(Promise.resolve(new Response()));
+    const withResourceInfo = {
+      internal_resourceInfo: {
+        fetchedFrom: "https://arbitrary.pod/resource",
+        isLitDataset: true,
+        unstable_aclUrl: "https://arbitrary.pod/resource.acl",
+      },
+    };
+    const aclResource: unstable_AclDataset = Object.assign(dataset(), {
+      internal_resourceInfo: {
+        fetchedFrom: "https://arbitrary-other.pod/resource.acl",
+        isLitDataset: true,
+      },
+      internal_accessTo: "https://arbitrary.pod/resource",
+      internal_changeLog: {
+        additions: [],
+        deletions: [],
+      },
+    });
+
+    await unstable_saveAclFor(withResourceInfo, aclResource, {
+      fetch: mockFetch,
+    });
+
+    expect(mockFetch.mock.calls[0][1]?.method).toBe("PUT");
+  });
+});
+
+describe("deleteAclFor", () => {
+  it("calls the included fetcher by default", async () => {
+    const mockedFetcher = jest.requireMock("../fetcher.ts") as {
+      fetch: jest.Mock<
+        ReturnType<typeof window.fetch>,
+        [RequestInfo, RequestInit?]
+      >;
+    };
+    const mockResource: WithResourceInfo & unstable_WithAccessibleAcl = {
+      internal_resourceInfo: {
+        fetchedFrom: "https://some.pod/resource",
+        isLitDataset: false,
+        unstable_aclUrl: "https://some.pod/resource.acl",
+      },
+    };
+
+    await unstable_deleteAclFor(mockResource);
+
+    expect(mockedFetcher.fetch.mock.calls).toEqual([
+      [
+        "https://some.pod/resource.acl",
+        {
+          method: "DELETE",
+        },
+      ],
+    ]);
+  });
+
+  it("uses the given fetcher if provided", async () => {
+    const mockFetch = jest
+      .fn(window.fetch)
+      .mockReturnValue(Promise.resolve(new Response()));
+
+    const mockResource: WithResourceInfo & unstable_WithAccessibleAcl = {
+      internal_resourceInfo: {
+        fetchedFrom: "https://some.pod/resource",
+        isLitDataset: false,
+        unstable_aclUrl: "https://some.pod/resource.acl",
+      },
+    };
+
+    await unstable_deleteAclFor(mockResource, { fetch: mockFetch });
+
+    expect(mockFetch.mock.calls).toEqual([
+      [
+        "https://some.pod/resource.acl",
+        {
+          method: "DELETE",
+        },
+      ],
+    ]);
+  });
+
+  it("returns the input Resource without a Resource ACL", async () => {
+    const mockFetch = jest
+      .fn(window.fetch)
+      .mockReturnValue(Promise.resolve(new Response()));
+
+    const mockResource: WithResourceInfo & unstable_WithAccessibleAcl = {
+      internal_resourceInfo: {
+        fetchedFrom: "https://some.pod/resource",
+        isLitDataset: false,
+        unstable_aclUrl: "https://some.pod/resource.acl",
+      },
+    };
+
+    const savedResource = await unstable_deleteAclFor(mockResource, {
+      fetch: mockFetch,
+    });
+
+    expect(savedResource.acl.resourceAcl).toBeNull();
+  });
+
+  it("returns a meaningful error when the server returns a 403", async () => {
+    const mockFetch = jest
+      .fn(window.fetch)
+      .mockReturnValue(
+        Promise.resolve(new Response("Not allowed", { status: 403 }))
+      );
+
+    const mockResource: WithResourceInfo & unstable_WithAccessibleAcl = {
+      internal_resourceInfo: {
+        fetchedFrom: "https://some.pod/resource",
+        isLitDataset: false,
+        unstable_aclUrl: "https://some.pod/resource.acl",
+      },
+    };
+
+    const fetchPromise = unstable_deleteAclFor(mockResource, {
+      fetch: mockFetch,
+    });
+
+    await expect(fetchPromise).rejects.toThrow(
+      new Error("Deleting the ACL failed: 403 Forbidden.")
+    );
+  });
+
+  it("returns a meaningful error when the server returns a 404", async () => {
+    const mockFetch = jest
+      .fn(window.fetch)
+      .mockReturnValue(
+        Promise.resolve(new Response("Not found", { status: 404 }))
+      );
+
+    const mockResource: WithResourceInfo & unstable_WithAccessibleAcl = {
+      internal_resourceInfo: {
+        fetchedFrom: "https://some.pod/resource",
+        isLitDataset: false,
+        unstable_aclUrl: "https://some.pod/resource.acl",
+      },
+    };
+
+    const fetchPromise = unstable_deleteAclFor(mockResource, {
+      fetch: mockFetch,
+    });
+
+    await expect(fetchPromise).rejects.toThrow(
+      new Error("Deleting the ACL failed: 404 Not Found.")
+    );
   });
 });

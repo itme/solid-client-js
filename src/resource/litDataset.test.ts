@@ -20,7 +20,7 @@
  */
 
 import { describe, it, expect } from "@jest/globals";
-jest.mock("./fetcher.ts", () => ({
+jest.mock("../fetcher.ts", () => ({
   fetch: jest.fn().mockImplementation(() =>
     Promise.resolve(
       new Response(undefined, {
@@ -46,7 +46,7 @@ import {
   IriString,
   LitDataset,
   LocalNode,
-} from "./interfaces";
+} from "../interfaces";
 
 function mockResponse(
   body?: BodyInit | null,
@@ -65,7 +65,7 @@ describe("createLitDataset", () => {
 
 describe("fetchLitDataset", () => {
   it("calls the included fetcher by default", async () => {
-    const mockedFetcher = jest.requireMock("./fetcher.ts") as {
+    const mockedFetcher = jest.requireMock("../fetcher.ts") as {
       fetch: jest.Mock<
         ReturnType<typeof window.fetch>,
         [RequestInfo, RequestInit?]
@@ -89,6 +89,18 @@ describe("fetchLitDataset", () => {
     expect(mockFetch.mock.calls).toEqual([["https://some.pod/resource"]]);
   });
 
+  it("can be called with NamedNodes", async () => {
+    const mockFetch = jest
+      .fn(window.fetch)
+      .mockReturnValue(Promise.resolve(new Response()));
+
+    await fetchLitDataset(DataFactory.namedNode("https://some.pod/resource"), {
+      fetch: mockFetch,
+    });
+
+    expect(mockFetch.mock.calls).toEqual([["https://some.pod/resource"]]);
+  });
+
   it("keeps track of where the LitDataset was fetched from", async () => {
     const mockFetch = jest
       .fn(window.fetch)
@@ -102,7 +114,7 @@ describe("fetchLitDataset", () => {
       fetch: mockFetch,
     });
 
-    expect(litDataset.resourceInfo.fetchedFrom).toBe(
+    expect(litDataset.internal_resourceInfo.fetchedFrom).toBe(
       "https://some.pod/resource"
     );
   });
@@ -124,7 +136,7 @@ describe("fetchLitDataset", () => {
       { fetch: mockFetch }
     );
 
-    expect(litDataset.resourceInfo.unstable_aclUrl).toBe(
+    expect(litDataset.internal_resourceInfo.unstable_aclUrl).toBe(
       "https://some.pod/container/aclresource.acl"
     );
   });
@@ -145,7 +157,7 @@ describe("fetchLitDataset", () => {
       { fetch: mockFetch }
     );
 
-    expect(litDataset.resourceInfo.unstable_aclUrl).toBeUndefined();
+    expect(litDataset.internal_resourceInfo.unstable_aclUrl).toBeUndefined();
   });
 
   it("provides the relevant access permissions to the Resource, if available", async () => {
@@ -164,7 +176,7 @@ describe("fetchLitDataset", () => {
       { fetch: mockFetch }
     );
 
-    expect(litDataset.resourceInfo.unstable_permissions).toEqual({
+    expect(litDataset.internal_resourceInfo.unstable_permissions).toEqual({
       user: {
         read: true,
         append: true,
@@ -197,7 +209,7 @@ describe("fetchLitDataset", () => {
       { fetch: mockFetch }
     );
 
-    expect(litDataset.resourceInfo.unstable_permissions).toEqual({
+    expect(litDataset.internal_resourceInfo.unstable_permissions).toEqual({
       user: {
         read: false,
         append: false,
@@ -227,7 +239,9 @@ describe("fetchLitDataset", () => {
       { fetch: mockFetch }
     );
 
-    expect(litDataset.resourceInfo.unstable_permissions).toBeUndefined();
+    expect(
+      litDataset.internal_resourceInfo.unstable_permissions
+    ).toBeUndefined();
   });
 
   it("returns a LitDataset representing the fetched Turtle", async () => {
@@ -314,15 +328,17 @@ describe("fetchLitDatasetWithAcl", () => {
       { fetch: mockFetch }
     );
 
-    expect(fetchedLitDataset.resourceInfo.fetchedFrom).toBe(
+    expect(fetchedLitDataset.internal_resourceInfo.fetchedFrom).toBe(
       "https://some.pod/resource"
     );
-    expect(fetchedLitDataset.acl?.resourceAcl?.resourceInfo.fetchedFrom).toBe(
-      "https://some.pod/resource.acl"
-    );
-    expect(fetchedLitDataset.acl?.fallbackAcl?.resourceInfo.fetchedFrom).toBe(
-      "https://some.pod/.acl"
-    );
+    expect(
+      fetchedLitDataset.internal_acl?.resourceAcl?.internal_resourceInfo
+        .fetchedFrom
+    ).toBe("https://some.pod/resource.acl");
+    expect(
+      fetchedLitDataset.internal_acl?.fallbackAcl?.internal_resourceInfo
+        .fetchedFrom
+    ).toBe("https://some.pod/.acl");
     expect(mockFetch.mock.calls).toHaveLength(4);
     expect(mockFetch.mock.calls[0][0]).toBe("https://some.pod/resource");
     expect(mockFetch.mock.calls[1][0]).toBe("https://some.pod/resource.acl");
@@ -331,7 +347,7 @@ describe("fetchLitDatasetWithAcl", () => {
   });
 
   it("calls the included fetcher by default", async () => {
-    const mockedFetcher = jest.requireMock("./fetcher.ts") as {
+    const mockedFetcher = jest.requireMock("../fetcher.ts") as {
       fetch: jest.Mock<
         ReturnType<typeof window.fetch>,
         [RequestInfo, RequestInit?]
@@ -365,8 +381,8 @@ describe("fetchLitDatasetWithAcl", () => {
     );
 
     expect(mockFetch.mock.calls).toHaveLength(1);
-    expect(fetchedLitDataset.acl.resourceAcl).toBeNull();
-    expect(fetchedLitDataset.acl.fallbackAcl).toBeNull();
+    expect(fetchedLitDataset.internal_acl.resourceAcl).toBeNull();
+    expect(fetchedLitDataset.internal_acl.fallbackAcl).toBeNull();
   });
 
   it("returns a meaningful error when the server returns a 403", async () => {
@@ -410,7 +426,7 @@ describe("fetchLitDatasetWithAcl", () => {
 
 describe("saveLitDatasetAt", () => {
   it("calls the included fetcher by default", async () => {
-    const mockedFetcher = jest.requireMock("./fetcher.ts") as {
+    const mockedFetcher = jest.requireMock("../fetcher.ts") as {
       fetch: jest.Mock<
         ReturnType<typeof window.fetch>,
         [RequestInfo, RequestInit?]
@@ -515,10 +531,10 @@ describe("saveLitDatasetAt", () => {
         .mockReturnValue(Promise.resolve(new Response()));
       const mockDataset = dataset();
       const subjectLocal: LocalNode = Object.assign(DataFactory.blankNode(), {
-        name: "some-subject-name",
+        internal_name: "some-subject-name",
       });
       const objectLocal: LocalNode = Object.assign(DataFactory.blankNode(), {
-        name: "some-object-name",
+        internal_name: "some-object-name",
       });
       mockDataset.add(
         DataFactory.quad(
@@ -544,10 +560,10 @@ describe("saveLitDatasetAt", () => {
         .mockReturnValue(Promise.resolve(new Response()));
       const mockDataset = dataset();
       const subjectLocal: LocalNode = Object.assign(DataFactory.blankNode(), {
-        name: "some-subject-name",
+        internal_name: "some-subject-name",
       });
       const objectLocal: LocalNode = Object.assign(DataFactory.blankNode(), {
-        name: "some-object-name",
+        internal_name: "some-object-name",
       });
       mockDataset.add(
         DataFactory.quad(
@@ -582,7 +598,7 @@ describe("saveLitDatasetAt", () => {
         mockDataset
       );
 
-      expect(storedLitDataset.changeLog).toEqual({
+      expect(storedLitDataset.internal_changeLog).toEqual({
         additions: [],
         deletions: [],
       });
@@ -605,7 +621,7 @@ describe("saveLitDatasetAt", () => {
 
   describe("when updating an existing resource", () => {
     function getMockUpdatedDataset(
-      changeLog: WithChangeLog["changeLog"],
+      changeLog: WithChangeLog["internal_changeLog"],
       fromUrl: IriString
     ): LitDataset & WithChangeLog & WithResourceInfo {
       const mockDataset = dataset();
@@ -622,14 +638,14 @@ describe("saveLitDatasetAt", () => {
         mockDataset.add(tripleToAdd)
       );
 
-      const resourceInfo: WithResourceInfo["resourceInfo"] = {
+      const resourceInfo: WithResourceInfo["internal_resourceInfo"] = {
         fetchedFrom: fromUrl,
         isLitDataset: true,
       };
 
       return Object.assign(mockDataset, {
-        changeLog: changeLog,
-        resourceInfo: resourceInfo,
+        internal_changeLog: changeLog,
+        internal_resourceInfo: resourceInfo,
       });
     }
 
@@ -684,10 +700,10 @@ describe("saveLitDatasetAt", () => {
         .mockReturnValue(Promise.resolve(new Response()));
 
       const subjectLocal: LocalNode = Object.assign(DataFactory.blankNode(), {
-        name: "some-subject-name",
+        internal_name: "some-subject-name",
       });
       const objectLocal: LocalNode = Object.assign(DataFactory.blankNode(), {
-        name: "some-object-name",
+        internal_name: "some-object-name",
       });
       const mockDataset = getMockUpdatedDataset(
         {
@@ -729,10 +745,10 @@ describe("saveLitDatasetAt", () => {
         .mockReturnValue(Promise.resolve(new Response()));
 
       const subjectLocal: LocalNode = Object.assign(DataFactory.blankNode(), {
-        name: "some-subject-name",
+        internal_name: "some-subject-name",
       });
       const objectLocal: LocalNode = Object.assign(DataFactory.blankNode(), {
-        name: "some-object-name",
+        internal_name: "some-object-name",
       });
       const mockDataset = getMockUpdatedDataset(
         {
@@ -876,7 +892,7 @@ describe("saveLitDatasetAt", () => {
         mockDataset
       );
 
-      expect(storedLitDataset.changeLog).toEqual({
+      expect(storedLitDataset.internal_changeLog).toEqual({
         additions: [],
         deletions: [],
       });
@@ -890,7 +906,7 @@ describe("saveLitDatasetInContainer", () => {
   });
 
   it("calls the included fetcher by default", async () => {
-    const mockedFetcher = jest.requireMock("./fetcher.ts") as {
+    const mockedFetcher = jest.requireMock("../fetcher.ts") as {
       fetch: jest.Mock<
         ReturnType<typeof window.fetch>,
         [RequestInfo, RequestInit?]
@@ -1017,10 +1033,10 @@ describe("saveLitDatasetInContainer", () => {
       .fn(window.fetch)
       .mockReturnValue(Promise.resolve(mockResponse));
     const subjectLocal: LocalNode = Object.assign(DataFactory.blankNode(), {
-      name: "some-subject-name",
+      internal_name: "some-subject-name",
     });
     const objectLocal: LocalNode = Object.assign(DataFactory.blankNode(), {
-      name: "some-object-name",
+      internal_name: "some-object-name",
     });
     const mockDataset = dataset();
     mockDataset.add(
@@ -1100,7 +1116,7 @@ describe("saveLitDatasetInContainer", () => {
       }
     );
 
-    expect(savedLitDataset.resourceInfo.fetchedFrom).toBe(
+    expect(savedLitDataset.internal_resourceInfo.fetchedFrom).toBe(
       "https://some.pod/container/resource"
     );
   });
@@ -1115,10 +1131,10 @@ describe("saveLitDatasetInContainer", () => {
     );
 
     const subjectLocal: LocalNode = Object.assign(DataFactory.blankNode(), {
-      name: "some-subject-name",
+      internal_name: "some-subject-name",
     });
     const objectLocal: LocalNode = Object.assign(DataFactory.blankNode(), {
-      name: "some-object-name",
+      internal_name: "some-object-name",
     });
     const mockDataset = dataset();
     mockDataset.add(
@@ -1163,7 +1179,7 @@ describe("saveLitDatasetInContainer", () => {
       }
     );
 
-    expect(savedLitDataset.resourceInfo.fetchedFrom).toBe(
+    expect(savedLitDataset.internal_resourceInfo.fetchedFrom).toBe(
       "https://some.pod/container/resource"
     );
   });

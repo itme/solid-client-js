@@ -4,14 +4,14 @@ title: Working with Data
 sidebar_label: Working with Data
 ---
 
-The two most important data structures when working with data in lit-pod are the `Thing` and the `LitDataset`:
+The two most important data structures when working with data in solid-client are the `Thing` and the `LitDataset`:
 
-- A [**`Thing`**](../api/modules/_interfaces_#thing) is the most basic store of data about a particular subject.
+- A [**`Thing`**](../api/modules/_interfaces_.md#thing) is the most basic store of data about a particular subject.
   Each Thing has its own URL to identify it. For example, the URL of the Thing about yours truly is:
 
   `https://vincentt.inrupt.net/profile/card#me`.
 
-- A [**`LitDataset`**](../api/modules/_interfaces_#litdataset) is a set of Things.
+- A [**`LitDataset`**](../api/modules/_interfaces_.md#litdataset) is a set of Things.
   It is primarily useful to be able to store multiple Things at the same location.
 
 Typically, all the Things in a LitDataset will have URLs relative to the location of that LitDataset.
@@ -26,7 +26,7 @@ I could even add a Thing with the URL of the LitDataset itself, e.g. to keep a l
 :::note A note about interoperability
 
 You might be wondering why we're not working with plain Javascript objects, storing them as JSON.
-And while [you _can_ do that](./working-with-files), there is one primary advantage of our approach:
+And while [you _can_ do that](./working-with-files.md), there is one primary advantage of our approach:
 **interoperability**.
 
 By giving every Thing its own URL, it can be combined with other data by linking to it. For example,
@@ -48,12 +48,12 @@ Let's go over those steps one by one.
 ### 1. Fetch a LitDataset
 
 To fetch a LitDataset, pass its URL to
-[`fetchLitDataset`](../api/modules/_litdataset_#fetchlitdataset). Usually, the first LitDataset to
-fetch will be the one at the authenticated user's [WebID](../glossary#webid), which will contain
+[`fetchLitDataset`](../api/modules/_resource_litdataset_.md#fetchlitdataset). Usually, the first LitDataset to
+fetch will be the one at the authenticated user's [WebID](../glossary.mdx#webid), which will contain
 links to other potentially relevant LitDatasets.
 
 ```typescript
-import { fetchLitDataset } from "@solid/lit-pod";
+import { fetchLitDataset } from "@inrupt/solid-client";
 
 const litDataset = await fetchLitDataset(
   "https://example.com/some/interesting/resource"
@@ -64,11 +64,11 @@ const litDataset = await fetchLitDataset(
 
 Given a LitDataset, you can either extract a single Thing for which you know its URL (e.g. because
 you found that URL on another Thing) using
-[`getThingOne`](../api/modules/_thing_#getthingone), or simply take all the
-Things inside the LitDataset using [`getThingAll`](../api/modules/_thing_#getthingall)
+[`getThingOne`](../api/modules/_thing_thing_.md#getthingone), or simply take all the
+Things inside the LitDataset using [`getThingAll`](../api/modules/_thing_thing_.md#getthingall)
 
 ```typescript
-import { getThingOne } from "@solid/lit-pod";
+import { getThingOne } from "@inrupt/solid-client";
 
 const thing = getThingOne(
   litDataset,
@@ -110,7 +110,7 @@ import {
   getStringNoLocaleAll,
   getStringNoLocaleOne,
   getUrlAll,
-} from "@solid/lit-pod";
+} from "@inrupt/solid-client";
 
 // We're looking for data…
 // …stating the Thing's name (`http://xmlns.com/foaf/0.1/name`)
@@ -138,19 +138,19 @@ const acquaintances = getUrlAll(thing, "http://xmlns.com/foaf/0.1/knows");
 // => an array of URLs, presumably pointing to the Things describing acquaintances.
 ```
 
-For an overview of all data access functions, see [`thing/get`](../api/modules/_thing_get_).
+For an overview of all data access functions, see [`thing/get`](../api/modules/_thing_get_.md).
 
 ### Reading data - full example
 
 Putting it all together, here's an example of fetching the nickname of someone with a known
-[WebID](../glossary#webid) (`https://vincentt.inrupt.net/profile/card#me`):
+[WebID](../glossary.mdx#webid) (`https://vincentt.inrupt.net/profile/card#me`):
 
 ```typescript
 import {
   fetchLitDataset,
   getThingOne,
   getStringNoLocaleOne,
-} from "@solid/lit-pod";
+} from "@inrupt/solid-client";
 
 const profileResource = await fetchLitDataset(
   "https://vincentt.inrupt.net/profile/card"
@@ -183,7 +183,7 @@ Again, let's cover them one by one.
 We can start with [a Thing we obtained earlier](#2-obtain-a-thing), or create an empty one:
 
 ```typescript
-import { createThing } from "@solid/lit-pod";
+import { createThing } from "@inrupt/solid-client";
 
 const thing = createThing();
 ```
@@ -198,7 +198,7 @@ Let's say we're trying to add a nickname, a characteristic identified by `http:/
 It will be a string (`"timbl"`), and will be in addition to any existing nicknames already listed in `thing`:
 
 ```typescript
-import { addStringNoLocale } from "@solid/lit-pod";
+import { addStringNoLocale } from "@inrupt/solid-client";
 
 let updatedThing = addStringNoLocale(
   thing,
@@ -210,12 +210,12 @@ let updatedThing = addStringNoLocale(
 Alternatively, if we want to replace existing values, we use the `set*` functions.
 Likewise, for removing data there are `remove*` functions.
 See which are available for which data type at
-[`thing/add`](../api/modules/_thing_add_), [`thing/set`](../api/modules/_thing_set_) and
-[`thing/remove`](../api/modules/_thing_remove_).
+[`thing/add`](../api/modules/_thing_add_.md), [`thing/set`](../api/modules/_thing_set_.md) and
+[`thing/remove`](../api/modules/_thing_remove_.md).
 
 :::tip A heads-up about immutability
 
-Note that lit-pod never modifies the objects you provide to it.
+Note that solid-client never modifies the objects you provide to it.
 Instead, it will create a new object based on the one it is given,
 with the requested changes applied.
 
@@ -234,7 +234,7 @@ If the updated Thing was based on an existing Thing obtained from that LitDatase
 the updated Thing will replace the previous one.
 
 ```typescript
-import { setThing } from "@solid/lit-pod";
+import { setThing } from "@inrupt/solid-client";
 
 const updatedDataset = setThing(litDataset, updatedThing);
 ```
@@ -242,11 +242,11 @@ const updatedDataset = setThing(litDataset, updatedThing);
 ### 3. Send the LitDataset to a Pod
 
 To save the updated LitDataset to a Pod, use
-[`saveLitDatasetAt`](../api/modules/_litdataset_#savelitdatasetat).
+[`saveLitDatasetAt`](../api/modules/_resource_litdataset_.md#savelitdatasetat).
 If the given location already contains data, that will be updated to match the given LitDataset.
 
 ```typescript
-import { saveLitDatasetAt } from "@solid/lit-pod";
+import { saveLitDatasetAt } from "@inrupt/solid-client";
 
 const savedLitDataset = await saveLitDatasetAt(
   "https://example.com/some/interesting/resource",
@@ -266,7 +266,7 @@ import {
   setStringNoLocaleOne,
   setThing,
   saveLitDatasetAt,
-} from "@solid/lit-pod";
+} from "@inrupt/solid-client";
 
 const profileResource = await fetchLitDataset(
   "https://vincentt.inrupt.net/profile/card"
@@ -297,6 +297,6 @@ Writing to a Pod is subject to access restriction:
 if you try to run this _exact_ example it will fail,
 because not everyone can write data into `https://vincentt.inrupt.net/profile/card`.
 It is, after all, my personal profile!
-For more details about access management, see [Managing Access](./managing-access).
+For more details about access management, see [Managing Access](./managing-access.md).
 
 :::

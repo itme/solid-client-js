@@ -24,17 +24,14 @@ import {
   UrlString,
   WithResourceInfo,
   unstable_WithAcl,
-  unstable_WithAccessibleAcl,
-  unstable_AclDataset,
   unstable_hasAccessibleAcl,
   unstable_Access,
-  IriString,
-  Iri,
-} from "./interfaces";
-import { saveLitDatasetAt } from "./litDataset";
-import { fetch } from "./fetcher";
-import { internal_fetchResourceAcl, internal_fetchFallbackAcl } from "./acl";
-import { ldp } from "./constants";
+} from "../interfaces";
+import { fetch } from "../fetcher";
+import {
+  internal_fetchResourceAcl,
+  internal_fetchFallbackAcl,
+} from "../acl/acl";
 
 /** @internal */
 export const internal_defaultFetchOptions = {
@@ -54,7 +51,7 @@ export async function internal_fetchResourceInfo(
   options: Partial<
     typeof internal_defaultFetchOptions
   > = internal_defaultFetchOptions
-): Promise<WithResourceInfo["resourceInfo"]> {
+): Promise<WithResourceInfo["internal_resourceInfo"]> {
   const config = {
     ...internal_defaultFetchOptions,
     ...options,
@@ -85,7 +82,7 @@ export async function internal_fetchAcl(
   options: Partial<
     typeof internal_defaultFetchOptions
   > = internal_defaultFetchOptions
-): Promise<unstable_WithAcl["acl"]> {
+): Promise<unstable_WithAcl["internal_acl"]> {
   if (!unstable_hasAccessibleAcl(resourceInfo)) {
     return {
       resourceAcl: null,
@@ -128,8 +125,14 @@ export async function unstable_fetchResourceInfoWithAcl(
   > = internal_defaultFetchOptions
 ): Promise<WithResourceInfo & unstable_WithAcl> {
   const resourceInfo = await internal_fetchResourceInfo(url, options);
-  const acl = await internal_fetchAcl({ resourceInfo }, options);
-  return Object.assign({ resourceInfo }, { acl });
+  const acl = await internal_fetchAcl(
+    { internal_resourceInfo: resourceInfo },
+    options
+  );
+  return Object.assign(
+    { internal_resourceInfo: resourceInfo },
+    { internal_acl: acl }
+  );
 }
 
 /**
@@ -137,14 +140,14 @@ export async function unstable_fetchResourceInfoWithAcl(
  */
 export function internal_parseResourceInfo(
   response: Response
-): WithResourceInfo["resourceInfo"] {
+): WithResourceInfo["internal_resourceInfo"] {
   const contentTypeParts =
     response.headers.get("Content-Type")?.split(";") ?? [];
   const isLitDataset =
     contentTypeParts.length > 0 &&
     ["text/turtle", "application/ld+json"].includes(contentTypeParts[0]);
 
-  const resourceInfo: WithResourceInfo["resourceInfo"] = {
+  const resourceInfo: WithResourceInfo["internal_resourceInfo"] = {
     fetchedFrom: response.url,
     isLitDataset: isLitDataset,
     contentType: response.headers.get("Content-Type") ?? undefined,
@@ -158,14 +161,6 @@ export function internal_parseResourceInfo(
     if (aclLinks.length === 1) {
       resourceInfo.unstable_aclUrl = new URL(
         aclLinks[0].uri,
-        resourceInfo.fetchedFrom
-      ).href;
-    }
-    // Set inbox link
-    const inboxLinks = parsedLinks.get("rel", ldp.inbox);
-    if (inboxLinks.length === 1) {
-      resourceInfo.inbox = new URL(
-        inboxLinks[0].uri,
         resourceInfo.fetchedFrom
       ).href;
     }
@@ -192,7 +187,7 @@ export function isContainer(resource: WithResourceInfo): boolean {
  * @return Whether `resource` contains a LitDataset.
  */
 export function isLitDataset(resource: WithResourceInfo): boolean {
-  return resource.resourceInfo.isLitDataset;
+  return resource.internal_resourceInfo.isLitDataset;
 }
 
 /**
@@ -200,7 +195,7 @@ export function isLitDataset(resource: WithResourceInfo): boolean {
  * @returns The Content Type, if known, or null if not known.
  */
 export function getContentType(resource: WithResourceInfo): string | null {
-  return resource.resourceInfo.contentType ?? null;
+  return resource.internal_resourceInfo.contentType ?? null;
 }
 
 /**
@@ -208,80 +203,7 @@ export function getContentType(resource: WithResourceInfo): string | null {
  * @returns The URL from which the resource has been fetched
  */
 export function getFetchedFrom(resource: WithResourceInfo): string {
-  return resource.resourceInfo.fetchedFrom;
-}
-
-export function hasInboxInfo(resource: WithResourceInfo): boolean {
-  return typeof resource.resourceInfo.inbox === "string";
-}
-
-export function getInboxInfo(resource: WithResourceInfo): string | null {
-  return resource.resourceInfo.inbox ?? null;
-}
-
-/**
- * Save the ACL for a Resource.
- *
- * @param resource The Resource to which the given ACL applies.
- * @param resourceAcl An [[unstable_AclDataset]] whose ACL Rules will apply to `resource`.
- * @param options Optional parameter `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
- */
-export async function unstable_saveAclFor(
-  resource: unstable_WithAccessibleAcl,
-  resourceAcl: unstable_AclDataset,
-  options: Partial<
-    typeof internal_defaultFetchOptions
-  > = internal_defaultFetchOptions
-): Promise<unstable_AclDataset & WithResourceInfo> {
-  const savedDataset = await saveLitDatasetAt(
-    resource.resourceInfo.unstable_aclUrl,
-    resourceAcl,
-    options
-  );
-  const savedAclDataset: unstable_AclDataset &
-    typeof savedDataset = Object.assign(savedDataset, {
-    accessTo: getFetchedFrom(resource),
-  });
-
-  return savedAclDataset;
-}
-
-/**
- * Remove the ACL of a Resource.
- *
- * @param resource The Resource for which you want to delete the Access Control List Resource.
- * @param options Optional parameter `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
- */
-export async function unstable_deleteAclFor<
-  Resource extends WithResourceInfo & unstable_WithAccessibleAcl
->(
-  resource: Resource,
-  options: Partial<
-    typeof internal_defaultFetchOptions
-  > = internal_defaultFetchOptions
-): Promise<Resource & { acl: { resourceAcl: null } }> {
-  const config = {
-    ...internal_defaultFetchOptions,
-    ...options,
-  };
-
-  const response = await config.fetch(resource.resourceInfo.unstable_aclUrl, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `Deleting the ACL failed: ${response.status} ${response.statusText}.`
-    );
-  }
-
-  const storedResource = Object.assign(resource, {
-    acl: {
-      resourceAcl: null,
-    },
-  });
-
-  return storedResource;
+  return resource.internal_resourceInfo.fetchedFrom;
 }
 
 /**
@@ -337,8 +259,4 @@ function parseWacAllowHeader(wacAllowHeader: string) {
     user: parsePermissionStatement(getStatementFor(wacAllowHeader, "user")),
     public: parsePermissionStatement(getStatementFor(wacAllowHeader, "public")),
   };
-}
-
-export function internal_toString(iri: Iri | IriString): string {
-  return typeof iri === "string" ? iri : iri.value;
 }

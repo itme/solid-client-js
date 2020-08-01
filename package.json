@@ -1,5 +1,5 @@
 {
-  "name": "@itme/lit-pod",
+  "name": "@itme/solid-client",
   "description": "Make your web apps work with Solid Pods.",
   "version": "0.0.1",
   "license": "MIT",
@@ -18,21 +18,21 @@
     "linked data",
     "turtle"
   ],
-  "homepage": "https://inrupt.github.io/lit-pod/",
-  "bugs": "https://github.com/inrupt/lit-pod/issues",
+  "homepage": "https://inrupt.github.io/solid-client-js/",
+  "bugs": "https://github.com/inrupt/solid-client-js/issues",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/inrupt/lit-pod.git"
+    "url": "https://github.com/inrupt/solid-client-js.git"
   },
   "devDependencies": {
     "@types/http-link-header": "^1.0.1",
     "@types/jest": "^26.0.0",
-    "@typescript-eslint/eslint-plugin": "^2.34.0",
-    "@typescript-eslint/parser": "^2.34.0",
+    "@typescript-eslint/eslint-plugin": "^3.7.0",
+    "@typescript-eslint/parser": "^3.7.0",
     "eslint": "^7.2.0",
     "eslint-plugin-jest": "^23.13.2",
     "eslint-plugin-license-header": "^0.2.0",

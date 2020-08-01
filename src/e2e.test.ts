@@ -96,9 +96,7 @@ describe("End-to-end tests", () => {
     );
     expect(isLitDataset(rdfResourceInfo)).toBe(true);
     expect(isLitDataset(nonRdfResourceInfo)).toBe(false);
-    // Fetching both Resource and Fallback ACLs takes quite a while on a bad network connection,
-    // so double Jest's default timeout of 5 seconds:
-  }, 10000);
+  });
 
   it("should be able to read and update ACLs", async () => {
     const fakeWebId =
@@ -146,7 +144,7 @@ describe("End-to-end tests", () => {
     const fallbackAclForDatasetWithoutAcl = unstable_getFallbackAcl(
       datasetWithoutAcl
     );
-    expect(fallbackAclForDatasetWithoutAcl?.accessTo).toBe(
+    expect(fallbackAclForDatasetWithoutAcl?.internal_accessTo).toBe(
       "https://lit-e2e-test.inrupt.net/public/lit-pod-acl-test/"
     );
 
@@ -179,9 +177,7 @@ describe("End-to-end tests", () => {
       });
       await unstable_saveAclFor(datasetWithAcl, cleanedAcl);
     }
-    // Fetching both Resource and Fallback ACLs takes quite a while on a bad network connection,
-    // so double Jest's default timeout of 5 seconds:
-  }, 10000);
+  });
 
   it("can copy default rules from the fallback ACL as Resource rules to a new ACL", async () => {
     const dataset = await unstable_fetchLitDatasetWithAcl(
@@ -198,9 +194,7 @@ describe("End-to-end tests", () => {
         unstable_getPublicResourceAccess(newResourceAcl)
       );
     }
-    // Fetching both Resource and Fallback ACLs takes quite a while on a bad network connection,
-    // so double Jest's default timeout of 5 seconds:
-  }, 10000);
+  });
 
   it("can fetch a non-RDF file and its metadata", async () => {
     const jsonFile = await unstable_fetchFile(

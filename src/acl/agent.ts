@@ -45,8 +45,8 @@ import {
   internal_removeEmptyAclRules,
   internal_getAclRulesForIri,
   internal_getAccessByIri,
-} from "../acl";
-import { createThing, getThingAll, setThing } from "../thing";
+} from "./acl";
+import { createThing, getThingAll, setThing } from "../thing/thing";
 import { removeIri } from "../thing/remove";
 import { setIri } from "../thing/set";
 import { addIri } from "../thing/add";
@@ -70,13 +70,13 @@ export function unstable_getAgentAccessOne(
 ): unstable_Access | null {
   if (unstable_hasResourceAcl(resourceInfo)) {
     return unstable_getAgentResourceAccessOne(
-      resourceInfo.acl.resourceAcl,
+      resourceInfo.internal_acl.resourceAcl,
       agent
     );
   }
   if (unstable_hasFallbackAcl(resourceInfo)) {
     return unstable_getAgentDefaultAccessOne(
-      resourceInfo.acl.fallbackAcl,
+      resourceInfo.internal_acl.fallbackAcl,
       agent
     );
   }
@@ -127,7 +127,7 @@ export function unstable_getAgentResourceAccessOne(
   const allRules = internal_getAclRules(aclDataset);
   const resourceRules = internal_getResourceAclRulesForResource(
     allRules,
-    aclDataset.accessTo
+    aclDataset.internal_accessTo
   );
   const agentResourceRules = getAgentAclRulesForAgent(resourceRules, agent);
   const agentAccessModes = agentResourceRules.map(internal_getAccess);
@@ -152,7 +152,7 @@ export function unstable_getAgentResourceAccessAll(
   const allRules = internal_getAclRules(aclDataset);
   const resourceRules = internal_getResourceAclRulesForResource(
     allRules,
-    aclDataset.accessTo
+    aclDataset.internal_accessTo
   );
   const agentResourceRules = getAgentAclRules(resourceRules);
   return getAccessByAgent(agentResourceRules);
@@ -191,7 +191,7 @@ export function unstable_setAgentResourceAccess(
     const [filteredRule, remainingRule] = removeAgentFromResourceRule(
       aclRule,
       agent,
-      aclDataset.accessTo
+      aclDataset.internal_accessTo
     );
     filteredAcl = setThing(filteredAcl, filteredRule);
     filteredAcl = setThing(filteredAcl, remainingRule);
@@ -199,7 +199,7 @@ export function unstable_setAgentResourceAccess(
 
   // Create a new Rule that only grants the given Agent the given Access Modes:
   let newRule = intialiseAclRule(access);
-  newRule = setIri(newRule, acl.accessTo, aclDataset.accessTo);
+  newRule = setIri(newRule, acl.accessTo, aclDataset.internal_accessTo);
   newRule = setIri(newRule, acl.agent, agent);
   const updatedAcl = setThing(filteredAcl, newRule);
 
@@ -229,7 +229,7 @@ export function unstable_getAgentDefaultAccessOne(
   const allRules = internal_getAclRules(aclDataset);
   const resourceRules = internal_getDefaultAclRulesForResource(
     allRules,
-    aclDataset.accessTo
+    aclDataset.internal_accessTo
   );
   const agentResourceRules = getAgentAclRulesForAgent(resourceRules, agent);
   const agentAccessModes = agentResourceRules.map(internal_getAccess);
@@ -254,7 +254,7 @@ export function unstable_getAgentDefaultAccessAll(
   const allRules = internal_getAclRules(aclDataset);
   const resourceRules = internal_getDefaultAclRulesForResource(
     allRules,
-    aclDataset.accessTo
+    aclDataset.internal_accessTo
   );
   const agentResourceRules = getAgentAclRules(resourceRules);
 
@@ -294,7 +294,7 @@ export function unstable_setAgentDefaultAccess(
     const [filteredRule, remainingRule] = removeAgentFromDefaultRule(
       aclRule,
       agent,
-      aclDataset.accessTo
+      aclDataset.internal_accessTo
     );
     filteredAcl = setThing(filteredAcl, filteredRule);
     filteredAcl = setThing(filteredAcl, remainingRule);
@@ -302,7 +302,7 @@ export function unstable_setAgentDefaultAccess(
 
   // Create a new Rule that only grants the given Agent the given default Access Modes:
   let newRule = intialiseAclRule(access);
-  newRule = setIri(newRule, acl.default, aclDataset.accessTo);
+  newRule = setIri(newRule, acl.default, aclDataset.internal_accessTo);
   newRule = setIri(newRule, acl.agent, agent);
   const updatedAcl = setThing(filteredAcl, newRule);
 
@@ -375,7 +375,7 @@ function removeAgentFromResourceRule(
   resourceIri: IriString
 ): [unstable_AclRule, unstable_AclRule] {
   // The existing rule will keep applying to Agents other than the given one:
-  let ruleWithoutAgent = removeIri(rule, acl.agent, agent);
+  const ruleWithoutAgent = removeIri(rule, acl.agent, agent);
   // The new rule will...
   let ruleForOtherTargets = duplicateAclRule(rule);
   // ...*only* apply to the given Agent (because the existing Rule covers the others)...
@@ -404,7 +404,7 @@ function removeAgentFromDefaultRule(
   containerIri: IriString
 ): [unstable_AclRule, unstable_AclRule] {
   // The existing rule will keep applying to Agents other than the given one:
-  let ruleWithoutAgent = removeIri(rule, acl.agent, agent);
+  const ruleWithoutAgent = removeIri(rule, acl.agent, agent);
   // The new rule will...
   let ruleForOtherTargets = duplicateAclRule(rule);
   // ...*only* apply to the given Agent (because the existing Rule covers the others)...
