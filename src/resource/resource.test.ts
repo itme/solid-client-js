@@ -37,7 +37,7 @@ import {
   isContainer,
   isLitDataset,
   getContentType,
-  unstable_fetchResourceInfoWithAcl,
+  fetchResourceInfoWithAcl,
 } from "./resource";
 import { WithResourceInfo } from "../interfaces";
 
@@ -61,16 +61,17 @@ describe("fetchAcl", () => {
       internal_resourceInfo: {
         fetchedFrom: "https://some.pod/resource",
         isLitDataset: true,
-        unstable_aclUrl: "https://some.pod/resource.acl",
+        aclUrl: "https://some.pod/resource.acl",
       },
     };
 
     await internal_fetchAcl(mockResourceInfo);
 
-    expect(mockedFetcher.fetch.mock.calls).toEqual([
-      ["https://some.pod/resource.acl"],
-      ["https://some.pod/", { method: "HEAD" }],
-    ]);
+    expect(mockedFetcher.fetch.mock.calls[0][0]).toEqual(
+      "https://some.pod/resource.acl"
+    );
+    expect(mockedFetcher.fetch.mock.calls[1][0]).toEqual("https://some.pod/");
+    expect(mockedFetcher.fetch.mock.calls[1][1]?.method).toEqual("HEAD");
   });
 
   it("does not attempt to fetch ACLs if the fetched Resource does not include a pointer to an ACL file, and sets an appropriate default value.", async () => {
@@ -112,7 +113,7 @@ describe("fetchAcl", () => {
       internal_resourceInfo: {
         fetchedFrom: "https://some.pod/resource",
         isLitDataset: true,
-        unstable_aclUrl: "https://some.pod/resource.acl",
+        aclUrl: "https://some.pod/resource.acl",
       },
     };
 
@@ -156,7 +157,7 @@ describe("fetchAcl", () => {
       internal_resourceInfo: {
         fetchedFrom: "https://some.pod/resource",
         isLitDataset: true,
-        unstable_aclUrl: "https://some.pod/resource.acl",
+        aclUrl: "https://some.pod/resource.acl",
       },
     };
 
@@ -188,7 +189,7 @@ describe("fetchResourceInfoWithAcl", () => {
       );
     });
 
-    const fetchedLitDataset = await unstable_fetchResourceInfoWithAcl(
+    const fetchedLitDataset = await fetchResourceInfoWithAcl(
       "https://some.pod/resource",
       { fetch: mockFetch }
     );
@@ -219,7 +220,7 @@ describe("fetchResourceInfoWithAcl", () => {
       >;
     };
 
-    await unstable_fetchResourceInfoWithAcl("https://some.pod/resource");
+    await fetchResourceInfoWithAcl("https://some.pod/resource");
 
     expect(mockedFetcher.fetch.mock.calls).toEqual([
       [
@@ -245,7 +246,7 @@ describe("fetchResourceInfoWithAcl", () => {
       )
     );
 
-    const fetchedLitDataset = await unstable_fetchResourceInfoWithAcl(
+    const fetchedLitDataset = await fetchResourceInfoWithAcl(
       "https://some.pod/resource",
       { fetch: mockFetch }
     );
@@ -262,7 +263,7 @@ describe("fetchResourceInfoWithAcl", () => {
         Promise.resolve(new Response("Not allowed", { status: 403 }))
       );
 
-    const fetchPromise = unstable_fetchResourceInfoWithAcl(
+    const fetchPromise = fetchResourceInfoWithAcl(
       "https://arbitrary.pod/resource",
       {
         fetch: mockFetch,
@@ -281,7 +282,7 @@ describe("fetchResourceInfoWithAcl", () => {
         Promise.resolve(new Response("Not found", { status: 404 }))
       );
 
-    const fetchPromise = unstable_fetchResourceInfoWithAcl(
+    const fetchPromise = fetchResourceInfoWithAcl(
       "https://arbitrary.pod/resource",
       {
         fetch: mockFetch,
@@ -302,7 +303,7 @@ describe("fetchResourceInfoWithAcl", () => {
         )
       );
 
-    await unstable_fetchResourceInfoWithAcl("https://some.pod/resource", {
+    await fetchResourceInfoWithAcl("https://some.pod/resource", {
       fetch: mockFetch,
     });
 
@@ -472,7 +473,7 @@ describe("fetchResourceInfo", () => {
       { fetch: mockFetch }
     );
 
-    expect(litDatasetInfo.unstable_aclUrl).toBe(
+    expect(litDatasetInfo.aclUrl).toBe(
       "https://some.pod/container/aclresource.acl"
     );
   });
@@ -493,7 +494,7 @@ describe("fetchResourceInfo", () => {
       { fetch: mockFetch }
     );
 
-    expect(litDatasetInfo.unstable_aclUrl).toBeUndefined();
+    expect(litDatasetInfo.aclUrl).toBeUndefined();
   });
 
   it("provides the relevant access permissions to the Resource, if available", async () => {
@@ -512,7 +513,7 @@ describe("fetchResourceInfo", () => {
       { fetch: mockFetch }
     );
 
-    expect(litDatasetInfo.unstable_permissions).toEqual({
+    expect(litDatasetInfo.permissions).toEqual({
       user: {
         read: true,
         append: true,
@@ -545,7 +546,7 @@ describe("fetchResourceInfo", () => {
       { fetch: mockFetch }
     );
 
-    expect(litDatasetInfo.unstable_permissions).toEqual({
+    expect(litDatasetInfo.permissions).toEqual({
       user: {
         read: false,
         append: false,
@@ -575,7 +576,7 @@ describe("fetchResourceInfo", () => {
       { fetch: mockFetch }
     );
 
-    expect(litDatasetInfo.unstable_permissions).toBeUndefined();
+    expect(litDatasetInfo.permissions).toBeUndefined();
   });
 
   it("does not request the actual data from the server", async () => {

@@ -37,7 +37,7 @@ import {
   fetchLitDataset,
   saveLitDatasetAt,
   saveLitDatasetInContainer,
-  unstable_fetchLitDatasetWithAcl,
+  fetchLitDatasetWithAcl,
   createLitDataset,
 } from "./litDataset";
 import {
@@ -74,9 +74,9 @@ describe("fetchLitDataset", () => {
 
     await fetchLitDataset("https://some.pod/resource");
 
-    expect(mockedFetcher.fetch.mock.calls).toEqual([
-      ["https://some.pod/resource"],
-    ]);
+    expect(mockedFetcher.fetch.mock.calls[0][0]).toEqual(
+      "https://some.pod/resource"
+    );
   });
 
   it("uses the given fetcher if provided", async () => {
@@ -86,7 +86,21 @@ describe("fetchLitDataset", () => {
 
     await fetchLitDataset("https://some.pod/resource", { fetch: mockFetch });
 
-    expect(mockFetch.mock.calls).toEqual([["https://some.pod/resource"]]);
+    expect(mockFetch.mock.calls[0][0]).toEqual("https://some.pod/resource");
+  });
+
+  it("adds an Accept header accepting turtle by default", async () => {
+    const mockFetch = jest
+      .fn(window.fetch)
+      .mockReturnValue(Promise.resolve(new Response()));
+
+    await fetchLitDataset("https://some.pod/resource", { fetch: mockFetch });
+
+    expect(mockFetch.mock.calls[0][1]).toEqual({
+      headers: {
+        Accept: "text/turtle",
+      },
+    });
   });
 
   it("can be called with NamedNodes", async () => {
@@ -98,7 +112,7 @@ describe("fetchLitDataset", () => {
       fetch: mockFetch,
     });
 
-    expect(mockFetch.mock.calls).toEqual([["https://some.pod/resource"]]);
+    expect(mockFetch.mock.calls[0][0]).toEqual("https://some.pod/resource");
   });
 
   it("keeps track of where the LitDataset was fetched from", async () => {
@@ -136,7 +150,7 @@ describe("fetchLitDataset", () => {
       { fetch: mockFetch }
     );
 
-    expect(litDataset.internal_resourceInfo.unstable_aclUrl).toBe(
+    expect(litDataset.internal_resourceInfo.aclUrl).toBe(
       "https://some.pod/container/aclresource.acl"
     );
   });
@@ -157,7 +171,7 @@ describe("fetchLitDataset", () => {
       { fetch: mockFetch }
     );
 
-    expect(litDataset.internal_resourceInfo.unstable_aclUrl).toBeUndefined();
+    expect(litDataset.internal_resourceInfo.aclUrl).toBeUndefined();
   });
 
   it("provides the relevant access permissions to the Resource, if available", async () => {
@@ -176,7 +190,7 @@ describe("fetchLitDataset", () => {
       { fetch: mockFetch }
     );
 
-    expect(litDataset.internal_resourceInfo.unstable_permissions).toEqual({
+    expect(litDataset.internal_resourceInfo.permissions).toEqual({
       user: {
         read: true,
         append: true,
@@ -209,7 +223,7 @@ describe("fetchLitDataset", () => {
       { fetch: mockFetch }
     );
 
-    expect(litDataset.internal_resourceInfo.unstable_permissions).toEqual({
+    expect(litDataset.internal_resourceInfo.permissions).toEqual({
       user: {
         read: false,
         append: false,
@@ -239,9 +253,7 @@ describe("fetchLitDataset", () => {
       { fetch: mockFetch }
     );
 
-    expect(
-      litDataset.internal_resourceInfo.unstable_permissions
-    ).toBeUndefined();
+    expect(litDataset.internal_resourceInfo.permissions).toBeUndefined();
   });
 
   it("returns a LitDataset representing the fetched Turtle", async () => {
@@ -323,7 +335,7 @@ describe("fetchLitDatasetWithAcl", () => {
       );
     });
 
-    const fetchedLitDataset = await unstable_fetchLitDatasetWithAcl(
+    const fetchedLitDataset = await fetchLitDatasetWithAcl(
       "https://some.pod/resource",
       { fetch: mockFetch }
     );
@@ -354,11 +366,11 @@ describe("fetchLitDatasetWithAcl", () => {
       >;
     };
 
-    await unstable_fetchLitDatasetWithAcl("https://some.pod/resource");
+    await fetchLitDatasetWithAcl("https://some.pod/resource");
 
-    expect(mockedFetcher.fetch.mock.calls).toEqual([
-      ["https://some.pod/resource"],
-    ]);
+    expect(mockedFetcher.fetch.mock.calls[0][0]).toEqual(
+      "https://some.pod/resource"
+    );
   });
 
   it("does not attempt to fetch ACLs if the fetched Resource does not include a pointer to an ACL file, and sets an appropriate default value.", async () => {
@@ -375,7 +387,7 @@ describe("fetchLitDatasetWithAcl", () => {
       )
     );
 
-    const fetchedLitDataset = await unstable_fetchLitDatasetWithAcl(
+    const fetchedLitDataset = await fetchLitDatasetWithAcl(
       "https://some.pod/resource",
       { fetch: mockFetch }
     );
@@ -392,7 +404,7 @@ describe("fetchLitDatasetWithAcl", () => {
         Promise.resolve(new Response("Not allowed", { status: 403 }))
       );
 
-    const fetchPromise = unstable_fetchLitDatasetWithAcl(
+    const fetchPromise = fetchLitDatasetWithAcl(
       "https://arbitrary.pod/resource",
       {
         fetch: mockFetch,
@@ -411,7 +423,7 @@ describe("fetchLitDatasetWithAcl", () => {
         Promise.resolve(new Response("Not found", { status: 404 }))
       );
 
-    const fetchPromise = unstable_fetchLitDatasetWithAcl(
+    const fetchPromise = fetchLitDatasetWithAcl(
       "https://arbitrary.pod/resource",
       {
         fetch: mockFetch,

@@ -23,30 +23,42 @@ import { describe, it, expect } from "@jest/globals";
 import { DataFactory } from "n3";
 import { dataset } from "@rdfjs/dataset";
 import {
-  unstable_getPublicResourceAccess,
-  unstable_getPublicDefaultAccess,
-  unstable_getPublicAccess,
+  getPublicResourceAccess,
+  getPublicDefaultAccess,
+  getPublicAccess,
+  setPublicDefaultAccess,
+  setPublicResourceAccess,
 } from "./class";
 import {
   LitDataset,
   WithResourceInfo,
   IriString,
-  unstable_Access,
-  unstable_AclDataset,
-  unstable_WithAcl,
+  Access,
+  AclDataset,
+  WithAcl,
 } from "../interfaces";
+import { Quad } from "rdf-js";
+import { foaf } from "../constants";
+import { getThingAll } from "../thing/thing";
+import { getIriAll } from "../thing/get";
 
 function addAclRuleQuads(
   aclDataset: LitDataset & WithResourceInfo,
   resource: IriString,
-  access: unstable_Access,
+  access: Access,
   type: "resource" | "default",
   agentClass:
     | "http://xmlns.com/foaf/0.1/Agent"
     | "http://www.w3.org/ns/auth/acl#AuthenticatedAgent"
-): unstable_AclDataset {
+    | string,
+  ruleIri?: IriString,
+  targetType:
+    | "http://www.w3.org/ns/auth/acl#agentClass"
+    | "http://www.w3.org/ns/auth/acl#agent"
+    | "http://www.w3.org/ns/auth/acl#agentGroup" = "http://www.w3.org/ns/auth/acl#agentClass"
+): AclDataset {
   const subjectIri =
-    resource + "#" + encodeURIComponent(agentClass) + Math.random();
+    ruleIri ?? resource + "#" + encodeURIComponent(agentClass) + Math.random();
   aclDataset.add(
     DataFactory.quad(
       DataFactory.namedNode(subjectIri),
@@ -68,7 +80,7 @@ function addAclRuleQuads(
   aclDataset.add(
     DataFactory.quad(
       DataFactory.namedNode(subjectIri),
-      DataFactory.namedNode("http://www.w3.org/ns/auth/acl#agentClass"),
+      DataFactory.namedNode(targetType),
       DataFactory.namedNode(agentClass)
     )
   );
@@ -114,16 +126,16 @@ function addAclRuleQuads(
 
 function addAclDatasetToLitDataset(
   litDataset: LitDataset & WithResourceInfo,
-  aclDataset: unstable_AclDataset,
+  aclDataset: AclDataset,
   type: "resource" | "fallback"
-): LitDataset & WithResourceInfo & unstable_WithAcl {
-  const acl: unstable_WithAcl["internal_acl"] = {
+): LitDataset & WithResourceInfo & WithAcl {
+  const acl: WithAcl["internal_acl"] = {
     fallbackAcl: null,
     resourceAcl: null,
-    ...(((litDataset as any) as unstable_WithAcl).internal_acl ?? {}),
+    ...(((litDataset as any) as WithAcl).internal_acl ?? {}),
   };
   if (type === "resource") {
-    litDataset.internal_resourceInfo.unstable_aclUrl =
+    litDataset.internal_resourceInfo.aclUrl =
       aclDataset.internal_resourceInfo.fetchedFrom;
     aclDataset.internal_accessTo = litDataset.internal_resourceInfo.fetchedFrom;
     acl.resourceAcl = aclDataset;
@@ -158,7 +170,7 @@ describe("getPublicAccess", () => {
       "resource"
     );
 
-    const access = unstable_getPublicAccess(litDatasetWithAcl);
+    const access = getPublicAccess(litDatasetWithAcl);
 
     expect(access).toEqual({
       read: false,
@@ -183,7 +195,7 @@ describe("getPublicAccess", () => {
       "fallback"
     );
 
-    const access = unstable_getPublicAccess(litDatasetWithAcl);
+    const access = getPublicAccess(litDatasetWithAcl);
 
     expect(access).toEqual({
       read: false,
@@ -195,7 +207,7 @@ describe("getPublicAccess", () => {
 
   it("returns null if neither the Resource's own nor a fallback ACL was accessible", () => {
     const litDataset = getMockDataset("https://some.pod/container/resource");
-    const inaccessibleAcl: unstable_WithAcl = {
+    const inaccessibleAcl: WithAcl = {
       internal_acl: { fallbackAcl: null, resourceAcl: null },
     };
     const litDatasetWithInaccessibleAcl = Object.assign(
@@ -203,7 +215,7 @@ describe("getPublicAccess", () => {
       inaccessibleAcl
     );
 
-    expect(unstable_getPublicAccess(litDatasetWithInaccessibleAcl)).toBeNull();
+    expect(getPublicAccess(litDatasetWithInaccessibleAcl)).toBeNull();
   });
 
   it("ignores the fallback ACL rules if a Resource ACL LitDataset is available", () => {
@@ -233,7 +245,7 @@ describe("getPublicAccess", () => {
       "fallback"
     );
 
-    const access = unstable_getPublicAccess(litDatasetWithAcl);
+    const access = getPublicAccess(litDatasetWithAcl);
 
     expect(access).toEqual({
       read: true,
@@ -265,7 +277,7 @@ describe("getPublicAccess", () => {
       "resource"
     );
 
-    const access = unstable_getPublicAccess(litDatasetWithAcl);
+    const access = getPublicAccess(litDatasetWithAcl);
 
     expect(access).toEqual({
       read: true,
@@ -297,7 +309,7 @@ describe("getPublicAccess", () => {
       "fallback"
     );
 
-    const access = unstable_getPublicAccess(litDatasetWithAcl);
+    const access = getPublicAccess(litDatasetWithAcl);
 
     expect(access).toEqual({
       read: false,
@@ -318,7 +330,7 @@ describe("getPublicResourceAccess", () => {
       "http://xmlns.com/foaf/0.1/Agent"
     );
 
-    const publicAccess = unstable_getPublicResourceAccess(resourceAcl);
+    const publicAccess = getPublicResourceAccess(resourceAcl);
 
     expect(publicAccess).toEqual({
       read: true,
@@ -344,7 +356,7 @@ describe("getPublicResourceAccess", () => {
       "http://xmlns.com/foaf/0.1/Agent"
     );
 
-    const agentAccess = unstable_getPublicResourceAccess(resourceAcl);
+    const agentAccess = getPublicResourceAccess(resourceAcl);
 
     expect(agentAccess).toEqual({
       read: true,
@@ -363,7 +375,7 @@ describe("getPublicResourceAccess", () => {
       "http://www.w3.org/ns/auth/acl#AuthenticatedAgent"
     );
 
-    const agentAccess = unstable_getPublicResourceAccess(resourceAcl);
+    const agentAccess = getPublicResourceAccess(resourceAcl);
 
     expect(agentAccess).toEqual({
       read: false,
@@ -389,7 +401,7 @@ describe("getPublicResourceAccess", () => {
       "http://xmlns.com/foaf/0.1/Agent"
     );
 
-    const agentAccess = unstable_getPublicResourceAccess(resourceAcl);
+    const agentAccess = getPublicResourceAccess(resourceAcl);
 
     expect(agentAccess).toEqual({
       read: false,
@@ -415,7 +427,7 @@ describe("getPublicResourceAccess", () => {
       "http://xmlns.com/foaf/0.1/Agent"
     );
 
-    const agentAccess = unstable_getPublicResourceAccess(resourceAcl);
+    const agentAccess = getPublicResourceAccess(resourceAcl);
 
     expect(agentAccess).toEqual({
       read: false,
@@ -436,7 +448,7 @@ describe("getPublicDefaultAccess", () => {
       "http://xmlns.com/foaf/0.1/Agent"
     );
 
-    const agentAccess = unstable_getPublicDefaultAccess(containerAcl);
+    const agentAccess = getPublicDefaultAccess(containerAcl);
 
     expect(agentAccess).toEqual({
       read: true,
@@ -462,7 +474,7 @@ describe("getPublicDefaultAccess", () => {
       "http://xmlns.com/foaf/0.1/Agent"
     );
 
-    const agentAccess = unstable_getPublicDefaultAccess(containerAcl);
+    const agentAccess = getPublicDefaultAccess(containerAcl);
 
     expect(agentAccess).toEqual({
       read: true,
@@ -481,7 +493,7 @@ describe("getPublicDefaultAccess", () => {
       "http://www.w3.org/ns/auth/acl#AuthenticatedAgent"
     );
 
-    const agentAccess = unstable_getPublicDefaultAccess(containerAcl);
+    const agentAccess = getPublicDefaultAccess(containerAcl);
 
     expect(agentAccess).toEqual({
       read: false,
@@ -507,7 +519,7 @@ describe("getPublicDefaultAccess", () => {
       "http://xmlns.com/foaf/0.1/Agent"
     );
 
-    const agentAccess = unstable_getPublicDefaultAccess(containerAcl);
+    const agentAccess = getPublicDefaultAccess(containerAcl);
 
     expect(agentAccess).toEqual({
       read: false,
@@ -533,7 +545,7 @@ describe("getPublicDefaultAccess", () => {
       "http://xmlns.com/foaf/0.1/Agent"
     );
 
-    const agentAccess = unstable_getPublicDefaultAccess(containerAcl);
+    const agentAccess = getPublicDefaultAccess(containerAcl);
 
     expect(agentAccess).toEqual({
       read: false,
@@ -541,5 +553,694 @@ describe("getPublicDefaultAccess", () => {
       write: false,
       control: false,
     });
+  });
+});
+
+describe("setPublicResourceAccess", () => {
+  it("adds Quads for the appropriate resource Access Modes", () => {
+    const sourceDataset = Object.assign(
+      getMockDataset("https://arbitrary.pod/resource.acl"),
+      { internal_accessTo: "https://arbitrary.pod/resource" }
+    );
+
+    const updatedDataset = setPublicResourceAccess(sourceDataset, {
+      read: true,
+      append: true,
+      write: true,
+      control: true,
+    });
+
+    const updatedQuads: Quad[] = Array.from(updatedDataset);
+    expect(updatedQuads).toHaveLength(6);
+    expect(updatedQuads[0].predicate.value).toBe(
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+    );
+    expect(updatedQuads[0].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Authorization"
+    );
+    expect(updatedQuads[1].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#mode"
+    );
+    expect(updatedQuads[1].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Read"
+    );
+    expect(updatedQuads[2].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#mode"
+    );
+    expect(updatedQuads[2].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Write"
+    );
+    expect(updatedQuads[3].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#mode"
+    );
+    expect(updatedQuads[3].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Control"
+    );
+    expect(updatedQuads[4].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#accessTo"
+    );
+    expect(updatedQuads[4].object.value).toBe("https://arbitrary.pod/resource");
+    expect(updatedQuads[5].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#agentClass"
+    );
+    expect(updatedQuads[5].object.value).toBe(foaf.Agent);
+  });
+
+  it("does not copy over access for an unrelated Group or Agent Class", async () => {
+    let sourceDataset = addAclRuleQuads(
+      getMockDataset("https://arbitrary.pod/resource/?ext=acl"),
+      "https://arbitrary.pod/resource",
+      { read: true, append: false, write: false, control: false },
+      "default",
+      "http://xmlns.com/foaf/0.1/Agent",
+      "https://arbitrary.pod/resource/?ext=acl#owner",
+      "http://www.w3.org/ns/auth/acl#agentClass"
+    );
+
+    sourceDataset = addAclRuleQuads(
+      sourceDataset,
+      "https://arbitrary.pod/resource",
+      { read: true, append: false, write: false, control: false },
+      "default",
+      "https://arbitrary.pod/profileDoc#someGroup",
+      "https://arbitrary.pod/resource/?ext=acl#owner",
+      "http://www.w3.org/ns/auth/acl#agentGroup"
+    );
+
+    sourceDataset = addAclRuleQuads(
+      sourceDataset,
+      "https://arbitrary.pod/resource",
+      { read: true, append: false, write: false, control: false },
+      "default",
+      "https://arbitrary.pod/profileDoc#webId",
+      "https://arbitrary.pod/resource/?ext=acl#owner",
+      "http://www.w3.org/ns/auth/acl#agent"
+    );
+
+    const updatedDataset = setPublicResourceAccess(sourceDataset, {
+      read: true,
+      append: true,
+      write: false,
+      control: false,
+    });
+
+    // Explicitly check that the group ACL is separate from the modified agent ACL
+    getThingAll(updatedDataset).forEach((thing) => {
+      if (
+        getIriAll(thing, "http://www.w3.org/ns/auth/acl#agentGroup").length > 0
+      ) {
+        // The agent given resource access should not have default access
+        expect(
+          getIriAll(thing, "http://www.w3.org/ns/auth/acl#accessTo")
+        ).toHaveLength(0);
+      }
+      if (getIriAll(thing, "http://www.w3.org/ns/auth/acl#agent").length > 0) {
+        // The agent given resource access should not have default access
+        expect(
+          getIriAll(thing, "http://www.w3.org/ns/auth/acl#accessTo")
+        ).toHaveLength(0);
+      }
+    });
+
+    // Roughly check that the ACL dataset is as we expect it
+    const updatedQuads: Quad[] = Array.from(updatedDataset);
+    expect(updatedQuads).toHaveLength(14);
+  });
+
+  it("does not alter the input LitDataset", () => {
+    const sourceDataset = Object.assign(
+      getMockDataset("https://arbitrary.pod/resource.acl"),
+      { internal_accessTo: "https://arbitrary.pod/resource" }
+    );
+
+    setPublicResourceAccess(sourceDataset, {
+      read: true,
+      append: false,
+      write: false,
+      control: false,
+    });
+
+    expect(Array.from(sourceDataset)).toEqual([]);
+  });
+
+  it("keeps a log of changes made to the ACL", () => {
+    const sourceDataset = Object.assign(
+      getMockDataset("https://arbitrary.pod/resource.acl"),
+      { internal_accessTo: "https://arbitrary.pod/resource" }
+    );
+
+    const updatedDataset = setPublicResourceAccess(sourceDataset, {
+      read: true,
+      append: false,
+      write: false,
+      control: false,
+    });
+
+    const deletedQuads = updatedDataset.internal_changeLog.deletions;
+    expect(deletedQuads).toEqual([]);
+    const addedQuads = updatedDataset.internal_changeLog.additions;
+    expect(addedQuads).toHaveLength(4);
+    expect(addedQuads[0].predicate.value).toBe(
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+    );
+    expect(addedQuads[0].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Authorization"
+    );
+    expect(addedQuads[1].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#mode"
+    );
+    expect(addedQuads[1].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Read"
+    );
+    expect(addedQuads[2].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#accessTo"
+    );
+    expect(addedQuads[2].object.value).toBe("https://arbitrary.pod/resource");
+    expect(addedQuads[3].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#agentClass"
+    );
+    expect(addedQuads[3].object.value).toBe(foaf.Agent);
+  });
+
+  it("does not forget to add a Quad for Append access if Write access is not given", () => {
+    // This test is basically there to test for regressions
+    // if we ever try to be clever about inferring Append access
+    // (but we should be able to leave that to the server).
+    const sourceDataset = Object.assign(
+      getMockDataset("https://arbitrary.pod/resource.acl"),
+      { internal_accessTo: "https://arbitrary.pod/resource" }
+    );
+
+    const updatedDataset = setPublicResourceAccess(sourceDataset, {
+      read: false,
+      append: true,
+      write: false,
+      control: false,
+    });
+
+    const updatedQuads: Quad[] = Array.from(updatedDataset);
+    expect(updatedQuads).toHaveLength(4);
+    expect(updatedQuads[0].predicate.value).toBe(
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+    );
+    expect(updatedQuads[0].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Authorization"
+    );
+    expect(updatedQuads[1].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#mode"
+    );
+    expect(updatedQuads[1].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Append"
+    );
+    expect(updatedQuads[2].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#accessTo"
+    );
+    expect(updatedQuads[2].object.value).toBe("https://arbitrary.pod/resource");
+    expect(updatedQuads[3].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#agentClass"
+    );
+    expect(updatedQuads[3].object.value).toBe(foaf.Agent);
+  });
+
+  it("replaces existing Quads defining Access Modes for the public", () => {
+    const sourceDataset = addAclRuleQuads(
+      getMockDataset("https://arbitrary.pod/resource.acl"),
+      "https://arbitrary.pod/resource",
+      { read: false, append: false, write: false, control: true },
+      "resource",
+      foaf.Agent
+    );
+
+    const updatedDataset = setPublicResourceAccess(sourceDataset, {
+      read: true,
+      append: false,
+      write: false,
+      control: false,
+    });
+
+    const updatedQuads: Quad[] = Array.from(updatedDataset);
+    expect(updatedQuads).toHaveLength(4);
+    expect(updatedQuads[0].predicate.value).toBe(
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+    );
+    expect(updatedQuads[0].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Authorization"
+    );
+    expect(updatedQuads[1].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#mode"
+    );
+    expect(updatedQuads[1].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Read"
+    );
+    expect(updatedQuads[2].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#accessTo"
+    );
+    expect(updatedQuads[2].object.value).toBe("https://arbitrary.pod/resource");
+    expect(updatedQuads[3].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#agentClass"
+    );
+    expect(updatedQuads[3].object.value).toBe(foaf.Agent);
+  });
+
+  it("removes all Quads for an ACL rule if it no longer applies to anything", () => {
+    const sourceDataset = addAclRuleQuads(
+      getMockDataset("https://arbitrary.pod/resource.acl"),
+      "https://arbitrary.pod/resource",
+      { read: true, append: false, write: false, control: false },
+      "resource",
+      foaf.Agent
+    );
+
+    const updatedDataset = setPublicResourceAccess(sourceDataset, {
+      read: false,
+      append: false,
+      write: false,
+      control: false,
+    });
+
+    const updatedQuads: Quad[] = Array.from(updatedDataset);
+    expect(updatedQuads).toEqual([]);
+  });
+
+  it("does not copy over access for an unrelated Agent Class", async () => {
+    let sourceDataset = addAclRuleQuads(
+      getMockDataset("https://arbitrary.pod/resource/?ext=acl"),
+      "https://arbitrary.pod/resource",
+      { read: true, append: true, write: true, control: true },
+      "resource",
+      "http://www.w3.org/ns/auth/acl#AuthenticatedAgent",
+      "https://arbitrary.pod/resource/?ext=acl#loggedIn"
+    );
+    sourceDataset = addAclRuleQuads(
+      sourceDataset,
+      "https://arbitrary.pod/resource",
+      { read: true, append: true, write: true, control: true },
+      "default",
+      "http://www.w3.org/ns/auth/acl#AuthenticatedAgent",
+      "https://arbitrary.pod/resource/?ext=acl#loggedIn"
+    );
+
+    const updatedDataset = setPublicResourceAccess(sourceDataset, {
+      read: true,
+      append: true,
+      write: false,
+      control: false,
+    });
+
+    // Explicitly check that the agent class given Resource access doesn't get additional privileges
+    getThingAll(updatedDataset).forEach((thing) => {
+      if (
+        getIriAll(thing, "http://www.w3.org/ns/auth/acl#agentClass").includes(
+          "http://xmlns.com/foaf/0.1/Agent"
+        )
+      ) {
+        // The agent class given Resource Access should not have Default Access
+        expect(
+          getIriAll(thing, "http://www.w3.org/ns/auth/acl#default")
+        ).toHaveLength(0);
+      } else {
+        // The pre-existing Agent Class should still have Default access
+        expect(
+          getIriAll(thing, "http://www.w3.org/ns/auth/acl#default")
+        ).toHaveLength(1);
+      }
+    });
+
+    // Roughly check that the ACL dataset is as we expect it
+    const updatedQuads: Quad[] = Array.from(updatedDataset);
+    expect(updatedQuads).toHaveLength(13);
+  });
+});
+
+describe("setPublicDefaultAccess", () => {
+  it("adds Quads for the appropriate default Access Modes", () => {
+    const sourceDataset = Object.assign(
+      getMockDataset("https://arbitrary.pod/container/.acl"),
+      { internal_accessTo: "https://arbitrary.pod/container/" }
+    );
+
+    const updatedDataset = setPublicDefaultAccess(sourceDataset, {
+      read: true,
+      append: true,
+      write: true,
+      control: true,
+    });
+
+    const updatedQuads: Quad[] = Array.from(updatedDataset);
+    expect(updatedQuads).toHaveLength(6);
+    expect(updatedQuads[0].predicate.value).toBe(
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+    );
+    expect(updatedQuads[0].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Authorization"
+    );
+    expect(updatedQuads[1].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#mode"
+    );
+    expect(updatedQuads[1].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Read"
+    );
+    expect(updatedQuads[2].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#mode"
+    );
+    expect(updatedQuads[2].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Write"
+    );
+    expect(updatedQuads[3].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#mode"
+    );
+    expect(updatedQuads[3].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Control"
+    );
+    expect(updatedQuads[4].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#default"
+    );
+    expect(updatedQuads[4].object.value).toBe(
+      "https://arbitrary.pod/container/"
+    );
+    expect(updatedQuads[5].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#agentClass"
+    );
+    expect(updatedQuads[5].object.value).toBe(foaf.Agent);
+  });
+
+  it("does not copy over access for an unrelated Group or Agent Class", async () => {
+    let sourceDataset = addAclRuleQuads(
+      getMockDataset("https://arbitrary.pod/resource/?ext=acl"),
+      "https://arbitrary.pod/resource",
+      { read: true, append: false, write: false, control: false },
+      "resource",
+      "http://xmlns.com/foaf/0.1/Agent",
+      "https://arbitrary.pod/resource/?ext=acl#owner",
+      "http://www.w3.org/ns/auth/acl#agentClass"
+    );
+
+    sourceDataset = addAclRuleQuads(
+      sourceDataset,
+      "https://arbitrary.pod/resource",
+      { read: true, append: false, write: false, control: false },
+      "resource",
+      "https://arbitrary.pod/profileDoc#someGroup",
+      "https://arbitrary.pod/resource/?ext=acl#owner",
+      "http://www.w3.org/ns/auth/acl#agentGroup"
+    );
+
+    sourceDataset = addAclRuleQuads(
+      sourceDataset,
+      "https://arbitrary.pod/resource",
+      { read: true, append: false, write: false, control: false },
+      "resource",
+      "https://arbitrary.pod/profileDoc#webId",
+      "https://arbitrary.pod/resource/?ext=acl#owner",
+      "http://www.w3.org/ns/auth/acl#agent"
+    );
+
+    const updatedDataset = setPublicDefaultAccess(sourceDataset, {
+      read: true,
+      append: true,
+      write: false,
+      control: false,
+    });
+
+    // Explicitly check that the group ACL is separate from the modified agent ACL
+    getThingAll(updatedDataset).forEach((thing) => {
+      if (
+        getIriAll(thing, "http://www.w3.org/ns/auth/acl#agentGroup").length > 0
+      ) {
+        // The agent given resource access should not have default access
+        expect(
+          getIriAll(thing, "http://www.w3.org/ns/auth/acl#default")
+        ).toHaveLength(0);
+      }
+      if (getIriAll(thing, "http://www.w3.org/ns/auth/acl#agent").length > 0) {
+        // The agent given resource access should not have default access
+        expect(
+          getIriAll(thing, "http://www.w3.org/ns/auth/acl#default")
+        ).toHaveLength(0);
+      }
+    });
+
+    // Roughly check that the ACL dataset is as we expect it
+    const updatedQuads: Quad[] = Array.from(updatedDataset);
+    expect(updatedQuads).toHaveLength(14);
+  });
+
+  it("does not alter the input LitDataset", () => {
+    const sourceDataset = Object.assign(
+      getMockDataset("https://arbitrary.pod/container/.acl"),
+      { internal_accessTo: "https://arbitrary.pod/container/" }
+    );
+
+    setPublicDefaultAccess(sourceDataset, {
+      read: true,
+      append: false,
+      write: false,
+      control: false,
+    });
+
+    expect(Array.from(sourceDataset)).toEqual([]);
+  });
+
+  it("keeps a log of changes made to the ACL", () => {
+    const sourceDataset = Object.assign(
+      getMockDataset("https://arbitrary.pod/container/.acl"),
+      { internal_accessTo: "https://arbitrary.pod/container/" }
+    );
+
+    const updatedDataset = setPublicDefaultAccess(sourceDataset, {
+      read: true,
+      append: false,
+      write: false,
+      control: false,
+    });
+
+    const deletedQuads = updatedDataset.internal_changeLog.deletions;
+    expect(deletedQuads).toEqual([]);
+    const addedQuads = updatedDataset.internal_changeLog.additions;
+    expect(addedQuads).toHaveLength(4);
+    expect(addedQuads[0].predicate.value).toBe(
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+    );
+    expect(addedQuads[0].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Authorization"
+    );
+    expect(addedQuads[1].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#mode"
+    );
+    expect(addedQuads[1].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Read"
+    );
+    expect(addedQuads[2].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#default"
+    );
+    expect(addedQuads[2].object.value).toBe("https://arbitrary.pod/container/");
+    expect(addedQuads[3].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#agentClass"
+    );
+    expect(addedQuads[3].object.value).toBe(foaf.Agent);
+  });
+
+  it("does not forget to add a Quad for Append access if Write access is not given", () => {
+    // This test is basically there to test for regressions
+    // if we ever try to be clever about inferring Append access
+    // (but we should be able to leave that to the server).
+    const sourceDataset = Object.assign(
+      getMockDataset("https://arbitrary.pod/container/.acl"),
+      { internal_accessTo: "https://arbitrary.pod/container/" }
+    );
+
+    const updatedDataset = setPublicDefaultAccess(sourceDataset, {
+      read: false,
+      append: true,
+      write: false,
+      control: false,
+    });
+
+    const updatedQuads: Quad[] = Array.from(updatedDataset);
+    expect(updatedQuads).toHaveLength(4);
+    expect(updatedQuads[0].predicate.value).toBe(
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+    );
+    expect(updatedQuads[0].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Authorization"
+    );
+    expect(updatedQuads[1].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#mode"
+    );
+    expect(updatedQuads[1].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Append"
+    );
+    expect(updatedQuads[2].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#default"
+    );
+    expect(updatedQuads[2].object.value).toBe(
+      "https://arbitrary.pod/container/"
+    );
+    expect(updatedQuads[3].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#agentClass"
+    );
+    expect(updatedQuads[3].object.value).toBe(foaf.Agent);
+  });
+
+  it("replaces existing Quads defining Access Modes for the public", () => {
+    const sourceDataset = addAclRuleQuads(
+      getMockDataset("https://arbitrary.pod/container/.acl"),
+      "https://arbitrary.pod/container/",
+      { read: false, append: false, write: false, control: true },
+      "default",
+      foaf.Agent
+    );
+
+    const updatedDataset = setPublicDefaultAccess(sourceDataset, {
+      read: true,
+      append: false,
+      write: false,
+      control: false,
+    });
+
+    const updatedQuads: Quad[] = Array.from(updatedDataset);
+    expect(updatedQuads).toHaveLength(4);
+    expect(updatedQuads[0].predicate.value).toBe(
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+    );
+    expect(updatedQuads[0].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Authorization"
+    );
+    expect(updatedQuads[1].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#mode"
+    );
+    expect(updatedQuads[1].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Read"
+    );
+    expect(updatedQuads[2].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#default"
+    );
+    expect(updatedQuads[2].object.value).toBe(
+      "https://arbitrary.pod/container/"
+    );
+    expect(updatedQuads[3].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#agentClass"
+    );
+    expect(updatedQuads[3].object.value).toBe(foaf.Agent);
+  });
+
+  it("removes all Quads for an ACL rule if it no longer applies to anything", () => {
+    const sourceDataset = addAclRuleQuads(
+      getMockDataset("https://arbitrary.pod/container/.acl"),
+      "https://arbitrary.pod/container/",
+      { read: true, append: false, write: false, control: false },
+      "default",
+      foaf.Agent
+    );
+
+    const updatedDataset = setPublicDefaultAccess(sourceDataset, {
+      read: false,
+      append: false,
+      write: false,
+      control: false,
+    });
+
+    const updatedQuads: Quad[] = Array.from(updatedDataset);
+    expect(updatedQuads).toEqual([]);
+  });
+
+  it("does not remove ACL rules that apply to the public but also act as resource rules", () => {
+    const sourceDataset = addAclRuleQuads(
+      getMockDataset("https://arbitrary.pod/container/.acl"),
+      "https://arbitrary.pod/container/",
+      { read: true, append: false, write: false, control: false },
+      "default",
+      foaf.Agent
+    );
+    const aclRuleSubject = Array.from(sourceDataset)[0].subject;
+    sourceDataset.add(
+      DataFactory.quad(
+        aclRuleSubject,
+        DataFactory.namedNode("http://www.w3.org/ns/auth/acl#accessTo"),
+        DataFactory.namedNode("https://arbitrary.pod/container/")
+      )
+    );
+
+    const updatedDataset = setPublicDefaultAccess(sourceDataset, {
+      read: false,
+      append: false,
+      write: false,
+      control: false,
+    });
+
+    const updatedQuads: Quad[] = Array.from(updatedDataset);
+    expect(updatedQuads).toHaveLength(4);
+    expect(updatedQuads[0].predicate.value).toBe(
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+    );
+    expect(updatedQuads[0].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Authorization"
+    );
+    expect(updatedQuads[1].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#accessTo"
+    );
+    expect(updatedQuads[1].object.value).toBe(
+      "https://arbitrary.pod/container/"
+    );
+    expect(updatedQuads[2].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#mode"
+    );
+    expect(updatedQuads[2].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Read"
+    );
+    expect(updatedQuads[3].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#agentClass"
+    );
+    expect(updatedQuads[3].object.value).toBe(foaf.Agent);
+  });
+
+  it("does not remove ACL rules that apply to the public but also apply to a different Container", () => {
+    const sourceDataset = addAclRuleQuads(
+      getMockDataset("https://arbitrary.pod/container/.acl"),
+      "https://arbitrary.pod/container/",
+      { read: true, append: false, write: false, control: false },
+      "default",
+      foaf.Agent
+    );
+    const aclRuleSubject = Array.from(sourceDataset)[0].subject;
+    sourceDataset.add(
+      DataFactory.quad(
+        aclRuleSubject,
+        DataFactory.namedNode("http://www.w3.org/ns/auth/acl#default"),
+        DataFactory.namedNode("https://arbitrary.pod/other-container/")
+      )
+    );
+
+    const updatedDataset = setPublicDefaultAccess(sourceDataset, {
+      read: false,
+      append: false,
+      write: false,
+      control: false,
+    });
+
+    const updatedQuads: Quad[] = Array.from(updatedDataset);
+    expect(updatedQuads).toHaveLength(4);
+    expect(updatedQuads[0].predicate.value).toBe(
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+    );
+    expect(updatedQuads[0].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Authorization"
+    );
+    expect(updatedQuads[1].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#default"
+    );
+    expect(updatedQuads[1].object.value).toBe(
+      "https://arbitrary.pod/other-container/"
+    );
+    expect(updatedQuads[2].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#mode"
+    );
+    expect(updatedQuads[2].object.value).toBe(
+      "http://www.w3.org/ns/auth/acl#Read"
+    );
+    expect(updatedQuads[3].predicate.value).toBe(
+      "http://www.w3.org/ns/auth/acl#agentClass"
+    );
+    expect(updatedQuads[3].object.value).toBe(foaf.Agent);
   });
 });

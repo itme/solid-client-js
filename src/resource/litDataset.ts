@@ -31,7 +31,7 @@ import {
   WithResourceInfo,
   hasResourceInfo,
   LocalNode,
-  unstable_WithAcl,
+  WithAcl,
   Url,
   internal_toIriString,
 } from "../interfaces";
@@ -70,7 +70,11 @@ export async function fetchLitDataset(
     ...options,
   };
 
-  const response = await config.fetch(url);
+  const response = await config.fetch(url, {
+    headers: {
+      Accept: "text/turtle",
+    },
+  });
   if (!response.ok) {
     throw new Error(
       `Fetching the Resource failed: ${response.status} ${response.statusText}.`
@@ -112,12 +116,12 @@ export async function fetchLitDataset(
  * @param options Optional parameter `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
  * @returns A LitDataset and the ACLs that apply to it, if available to the authenticated user.
  */
-export async function unstable_fetchLitDatasetWithAcl(
+export async function fetchLitDatasetWithAcl(
   url: UrlString | Url,
   options: Partial<
     typeof internal_defaultFetchOptions
   > = internal_defaultFetchOptions
-): Promise<LitDataset & WithResourceInfo & unstable_WithAcl> {
+): Promise<LitDataset & WithResourceInfo & WithAcl> {
   const litDataset = await fetchLitDataset(url, options);
   const acl = await internal_fetchAcl(litDataset, options);
   return Object.assign(litDataset, { internal_acl: acl });
