@@ -113,7 +113,7 @@ export async function internal_fetchAcl(
  * applicable Container's ACL is not accessible to the authenticated user, `acl.fallbackAcl` will be
  * `null`.
  *
- * @param url URL of the LitDataset to fetch.
+ * @param url URL of the SolidDataset to fetch.
  * @param options Optional parameter `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
  * @returns A Resource's metadata and the ACLs that apply to the Resource, if available to the authenticated user.
  */
@@ -142,13 +142,18 @@ export function internal_parseResourceInfo(
 ): WithResourceInfo["internal_resourceInfo"] {
   const contentTypeParts =
     response.headers.get("Content-Type")?.split(";") ?? [];
-  const isLitDataset =
+  // If the server offers a Turtle or JSON-LD serialisation on its own accord,
+  // that tells us whether it is RDF data that the server can understand
+  // (and hence can be updated with a PATCH request with SPARQL INSERT and DELETE statements),
+  // in which case our SolidDataset-related functions should handle it.
+  // For more context, see https://github.com/inrupt/solid-client-js/pull/214.
+  const isSolidDataset =
     contentTypeParts.length > 0 &&
     ["text/turtle", "application/ld+json"].includes(contentTypeParts[0]);
 
   const resourceInfo: WithResourceInfo["internal_resourceInfo"] = {
-    fetchedFrom: response.url,
-    isLitDataset: isLitDataset,
+    sourceIri: response.url,
+    isRawData: !isSolidDataset,
     contentType: response.headers.get("Content-Type") ?? undefined,
   };
 
@@ -160,7 +165,7 @@ export function internal_parseResourceInfo(
     if (aclLinks.length === 1) {
       resourceInfo.aclUrl = new URL(
         aclLinks[0].uri,
-        resourceInfo.fetchedFrom
+        resourceInfo.sourceIri
       ).href;
     }
   }
@@ -178,15 +183,17 @@ export function internal_parseResourceInfo(
  * @returns Whether `resource` is a Container.
  */
 export function isContainer(resource: WithResourceInfo): boolean {
-  return getFetchedFrom(resource).endsWith("/");
+  return getSourceUrl(resource).endsWith("/");
 }
 
 /**
- * @param resource Resource for which to check whether it contains a LitDataset.
- * @return Whether `resource` contains a LitDataset.
+ * This function will tell you whether a given Resource contains raw data, or a SolidDataset.
+ *
+ * @param resource Resource for which to check whether it contains raw data.
+ * @return Whether `resource` contains raw data.
  */
-export function isLitDataset(resource: WithResourceInfo): boolean {
-  return resource.internal_resourceInfo.isLitDataset;
+export function isRawData(resource: WithResourceInfo): boolean {
+  return resource.internal_resourceInfo.isRawData;
 }
 
 /**
@@ -201,9 +208,11 @@ export function getContentType(resource: WithResourceInfo): string | null {
  * @param resource
  * @returns The URL from which the resource has been fetched
  */
-export function getFetchedFrom(resource: WithResourceInfo): string {
-  return resource.internal_resourceInfo.fetchedFrom;
+export function getSourceUrl(resource: WithResourceInfo): string {
+  return resource.internal_resourceInfo.sourceIri;
 }
+/** @hidden Alias of getSourceUrl for those who prefer to use IRI terminology. */
+export const getSourceIri = getSourceUrl;
 
 /**
  * Parse a WAC-Allow header into user and public access booleans.

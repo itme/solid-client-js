@@ -24,7 +24,7 @@ import { dataset } from "@rdfjs/dataset";
 import { NamedNode } from "rdf-js";
 import { DataFactory } from "n3";
 import {
-  getThingOne,
+  getThing,
   getThingAll,
   setThing,
   removeThing,
@@ -37,7 +37,7 @@ import {
   Thing,
   ThingLocal,
   ThingPersisted,
-  LitDataset,
+  SolidDataset,
   WithResourceInfo,
   WithChangeLog,
   LocalNode,
@@ -101,7 +101,7 @@ describe("createThing", () => {
   });
 });
 
-describe("getThingOne", () => {
+describe("getThing", () => {
   it("returns a Dataset with just Quads in there with the given Subject", () => {
     const relevantQuad = getMockQuad({ subject: "https://some.vocab/subject" });
     const datasetWithMultipleThings = dataset();
@@ -110,7 +110,7 @@ describe("getThingOne", () => {
       getMockQuad({ subject: "https://arbitrary-other.vocab/subject" })
     );
 
-    const thing = getThingOne(
+    const thing = getThing(
       datasetWithMultipleThings,
       "https://some.vocab/subject"
     );
@@ -123,7 +123,7 @@ describe("getThingOne", () => {
     const datasetWithAThing = dataset();
     datasetWithAThing.add(relevantQuad);
 
-    const thing = getThingOne(
+    const thing = getThing(
       datasetWithAThing,
       DataFactory.namedNode("https://some.vocab/subject")
     );
@@ -141,7 +141,7 @@ describe("getThingOne", () => {
     const datasetWithThingLocal = dataset();
     datasetWithThingLocal.add(quadWithLocalSubject);
 
-    const thing = getThingOne(datasetWithThingLocal, localSubject);
+    const thing = getThing(datasetWithThingLocal, localSubject);
 
     expect(Array.from(thing)).toEqual([quadWithLocalSubject]);
   });
@@ -158,7 +158,7 @@ describe("getThingOne", () => {
     datasetWithMultipleNamedGraphs.add(quadInDefaultGraph);
     datasetWithMultipleNamedGraphs.add(quadInArbitraryGraph);
 
-    const thing = getThingOne(
+    const thing = getThing(
       datasetWithMultipleNamedGraphs,
       "https://some.vocab/subject"
     );
@@ -182,7 +182,7 @@ describe("getThingOne", () => {
       })
     );
 
-    const thing = getThingOne(
+    const thing = getThing(
       datasetWithMultipleNamedGraphs,
       "https://some.vocab/subject",
       { scope: "https://some.vocab/namedGraph" }
@@ -205,7 +205,7 @@ describe("getThingOne", () => {
       })
     );
 
-    const thing = getThingOne(
+    const thing = getThing(
       datasetWithMultipleNamedGraphs,
       "https://some.vocab/subject",
       { scope: "https://some.vocab/namedGraph" }
@@ -228,7 +228,7 @@ describe("getThingOne", () => {
       })
     );
 
-    const thing = getThingOne(
+    const thing = getThing(
       datasetWithMultipleNamedGraphs,
       "https://some.vocab/subject",
       { scope: DataFactory.namedNode("https://some.vocab/namedGraph") }
@@ -500,7 +500,7 @@ describe("setThing", () => {
     const existingDeletion = getMockQuad({
       object: "https://some.vocab/deletion-object",
     });
-    const datasetWithExistingChangeLog: LitDataset &
+    const datasetWithExistingChangeLog: SolidDataset &
       WithChangeLog = Object.assign(dataset(), {
       internal_changeLog: {
         additions: [existingAddition],
@@ -531,7 +531,7 @@ describe("setThing", () => {
     ]);
   });
 
-  it("does not modify the original LitDataset", () => {
+  it("does not modify the original SolidDataset", () => {
     const oldThingQuad = getMockQuad({
       subject: "https://some.vocab/subject",
       object: "https://some.vocab/old-object",
@@ -545,7 +545,7 @@ describe("setThing", () => {
     const existingDeletion = getMockQuad({
       object: "https://some.vocab/deletion-object",
     });
-    const datasetWithExistingChangeLog: LitDataset &
+    const datasetWithExistingChangeLog: SolidDataset &
       WithChangeLog = Object.assign(dataset(), {
       internal_changeLog: {
         additions: [existingAddition],
@@ -627,17 +627,17 @@ describe("setThing", () => {
     expect(Array.from(updatedDataset)).toEqual([newThingQuad]);
   });
 
-  it("can reconcile new LocalNodes with existing NamedNodes if the LitDataset has a resource IRI attached", () => {
+  it("can reconcile new LocalNodes with existing NamedNodes if the SolidDataset has a resource IRI attached", () => {
     const oldThingQuad = getMockQuad({
       subject: "https://some.pod/resource#subject",
       object: "https://some.vocab/old-object",
     });
-    const datasetWithNamedNode: LitDataset & WithResourceInfo = Object.assign(
+    const datasetWithNamedNode: SolidDataset & WithResourceInfo = Object.assign(
       dataset(),
       {
         internal_resourceInfo: {
-          fetchedFrom: "https://some.pod/resource",
-          isLitDataset: true,
+          sourceIri: "https://some.pod/resource",
+          isRawData: false,
         },
       }
     );
@@ -665,7 +665,7 @@ describe("setThing", () => {
     expect(Array.from(updatedDataset)).toEqual([newThingQuad]);
   });
 
-  it("can reconcile new NamedNodes with existing LocalNodes if the LitDataset has a resource IRI attached", () => {
+  it("can reconcile new NamedNodes with existing LocalNodes if the SolidDataset has a resource IRI attached", () => {
     const localSubject = Object.assign(
       DataFactory.blankNode("Blank node representing a LocalNode"),
       { internal_name: "subject" }
@@ -678,11 +678,11 @@ describe("setThing", () => {
       mockPredicate,
       DataFactory.namedNode("https://some.vocab/new-object")
     );
-    const datasetWithLocalSubject: LitDataset &
+    const datasetWithLocalSubject: SolidDataset &
       WithResourceInfo = Object.assign(dataset(), {
       internal_resourceInfo: {
-        fetchedFrom: "https://some.pod/resource",
-        isLitDataset: true,
+        sourceIri: "https://some.pod/resource",
+        isRawData: false,
       },
     });
     datasetWithLocalSubject.add(oldThingQuad);
@@ -701,7 +701,7 @@ describe("setThing", () => {
     expect(Array.from(updatedDataset)).toEqual([newThingQuad]);
   });
 
-  it("only updates LocalNodes if the LitDataset has no known IRI", () => {
+  it("only updates LocalNodes if the SolidDataset has no known IRI", () => {
     const localSubject = Object.assign(
       DataFactory.blankNode("Blank node representing a LocalNode"),
       { internal_name: "localSubject" }
@@ -848,7 +848,7 @@ describe("removeThing", () => {
     const existingDeletion = getMockQuad({
       object: "https://some.vocab/deletion-object",
     });
-    const datasetWithExistingChangeLog: LitDataset &
+    const datasetWithExistingChangeLog: SolidDataset &
       WithChangeLog = Object.assign(dataset(), {
       internal_changeLog: {
         additions: [existingAddition],
@@ -878,7 +878,7 @@ describe("removeThing", () => {
       subject: "https://some.vocab/subject",
       object: "https://some.vocab/new-object",
     });
-    const datasetWithFetchedAcls: LitDataset & WithAcl = Object.assign(
+    const datasetWithFetchedAcls: SolidDataset & WithAcl = Object.assign(
       dataset(),
       {
         internal_acl: {
@@ -910,8 +910,8 @@ describe("removeThing", () => {
     const aclDataset: AclDataset = Object.assign(dataset(), {
       internal_accessTo: "https://arbitrary.pod/resource",
       internal_resourceInfo: {
-        fetchedFrom: "https://arbitrary.pod/resource.acl",
-        isLitDataset: true,
+        sourceIri: "https://arbitrary.pod/resource.acl",
+        isRawData: false,
       },
     });
     aclDataset.add(thingQuad);
@@ -927,8 +927,8 @@ describe("removeThing", () => {
       "https://arbitrary.pod/resource"
     );
     expect(updatedDataset.internal_resourceInfo).toEqual({
-      fetchedFrom: "https://arbitrary.pod/resource.acl",
-      isLitDataset: true,
+      sourceIri: "https://arbitrary.pod/resource.acl",
+      isRawData: false,
     });
   });
 
@@ -953,7 +953,7 @@ describe("removeThing", () => {
     expect(updatedDataset.internal_changeLog.deletions).toEqual([thingQuad]);
   });
 
-  it("does not modify the original LitDataset", () => {
+  it("does not modify the original SolidDataset", () => {
     const thingQuad = getMockQuad({
       subject: "https://some.vocab/subject",
       object: "https://some.vocab/new-object",
@@ -972,7 +972,7 @@ describe("removeThing", () => {
       otherQuad,
     ]);
     expect(
-      (datasetWithMultipleThings as LitDataset & WithChangeLog)
+      (datasetWithMultipleThings as SolidDataset & WithChangeLog)
         .internal_changeLog
     ).toBeUndefined();
   });
@@ -1038,17 +1038,17 @@ describe("removeThing", () => {
     expect(updatedDataset.internal_changeLog.deletions).toEqual([thingQuad]);
   });
 
-  it("can reconcile given LocalNodes with existing NamedNodes if the LitDataset has a resource IRI attached", () => {
+  it("can reconcile given LocalNodes with existing NamedNodes if the SolidDataset has a resource IRI attached", () => {
     const oldThingQuad = getMockQuad({
       subject: "https://some.pod/resource#subject",
       object: "https://some.vocab/old-object",
     });
-    const datasetWithNamedNode: LitDataset & WithResourceInfo = Object.assign(
+    const datasetWithNamedNode: SolidDataset & WithResourceInfo = Object.assign(
       dataset(),
       {
         internal_resourceInfo: {
-          fetchedFrom: "https://some.pod/resource",
-          isLitDataset: true,
+          sourceIri: "https://some.pod/resource",
+          isRawData: false,
         },
       }
     );
@@ -1064,7 +1064,7 @@ describe("removeThing", () => {
     expect(Array.from(updatedDataset)).toEqual([]);
   });
 
-  it("can reconcile given NamedNodes with existing LocalNodes if the LitDataset has a resource IRI attached", () => {
+  it("can reconcile given NamedNodes with existing LocalNodes if the SolidDataset has a resource IRI attached", () => {
     const localSubject = Object.assign(
       DataFactory.blankNode("Blank node representing a LocalNode"),
       { internal_name: "subject" }
@@ -1077,12 +1077,12 @@ describe("removeThing", () => {
       mockPredicate,
       DataFactory.namedNode("https://some.vocab/new-object")
     );
-    const datasetWithLocalNode: LitDataset & WithResourceInfo = Object.assign(
+    const datasetWithLocalNode: SolidDataset & WithResourceInfo = Object.assign(
       dataset(),
       {
         internal_resourceInfo: {
-          fetchedFrom: "https://some.pod/resource",
-          isLitDataset: true,
+          sourceIri: "https://some.pod/resource",
+          isRawData: false,
         },
       }
     );
@@ -1096,7 +1096,7 @@ describe("removeThing", () => {
     expect(Array.from(updatedDataset)).toEqual([]);
   });
 
-  it("only removes LocalNodes if the LitDataset has no known IRI", () => {
+  it("only removes LocalNodes if the SolidDataset has no known IRI", () => {
     const localSubject = Object.assign(
       DataFactory.blankNode("Blank node representing a LocalNode"),
       { internal_name: "localSubject" }

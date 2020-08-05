@@ -21,7 +21,7 @@
 
 import { Quad } from "rdf-js";
 import { acl, rdf } from "../constants";
-import { fetchLitDataset, saveLitDatasetAt } from "../resource/litDataset";
+import { getSolidDataset, saveSolidDatasetAt } from "../resource/solidDataset";
 import {
   WithResourceInfo,
   AclDataset,
@@ -30,7 +30,7 @@ import {
   Access,
   Thing,
   IriString,
-  LitDataset,
+  SolidDataset,
   WithAcl,
   WithAccessibleAcl,
   WithResourceAcl,
@@ -42,12 +42,12 @@ import {
   removeThing,
   setThing,
 } from "../thing/thing";
-import { getIriAll, getIriOne } from "../thing/get";
+import { getIriAll, getIri } from "../thing/get";
 import { DataFactory, dataset } from "../rdfjs";
 import { removeAll } from "../thing/remove";
 import { setIri } from "../thing/set";
 import {
-  getFetchedFrom,
+  getSourceUrl,
   internal_defaultFetchOptions,
   internal_fetchResourceInfo,
 } from "../resource/resource";
@@ -65,12 +65,12 @@ export async function internal_fetchResourceAcl(
   }
 
   try {
-    const aclLitDataset = await fetchLitDataset(
+    const aclSolidDataset = await getSolidDataset(
       dataset.internal_resourceInfo.aclUrl,
       options
     );
-    return Object.assign(aclLitDataset, {
-      internal_accessTo: getFetchedFrom(dataset),
+    return Object.assign(aclSolidDataset, {
+      internal_accessTo: getSourceUrl(dataset),
     });
   } catch (e) {
     // Since a Solid server adds a `Link` header to an ACL even if that ACL does not exist,
@@ -87,7 +87,7 @@ export async function internal_fetchFallbackAcl(
     typeof internal_defaultFetchOptions
   > = internal_defaultFetchOptions
 ): Promise<AclDataset | null> {
-  const resourceUrl = new URL(getFetchedFrom(resource));
+  const resourceUrl = new URL(getSourceUrl(resource));
   const resourcePath = resourceUrl.pathname;
   // Note: we're currently assuming that the Origin is the root of the Pod. However, it is not yet
   //       set in stone that that will always be the case. We might need to check the Container's
@@ -139,7 +139,7 @@ function getContainerPath(resourcePath: string): string {
 /**
  * Verify whether an ACL was found for the given Resource.
  *
- * A Resource fetched with its ACL (e.g. using [[fetchLitDatasetWithAcl]]) _might_ have a resource ACL attached, but
+ * A Resource fetched with its ACL (e.g. using [[getSolidDatasetWithAcl]]) _might_ have a resource ACL attached, but
  * we cannot be sure: it might be that none exists for this specific Resource (in which case the
  * fallback ACL applies), or the currently authenticated user (if any) might not have Control access
  * to the fetched Resource.
@@ -157,10 +157,10 @@ export function hasResourceAcl<Resource extends WithAcl & WithResourceInfo>(
 ): resource is Resource & WithResourceAcl & WithAccessibleAcl {
   return (
     resource.internal_acl.resourceAcl !== null &&
-    getFetchedFrom(resource) ===
+    getSourceUrl(resource) ===
       resource.internal_acl.resourceAcl.internal_accessTo &&
     resource.internal_resourceInfo.aclUrl ===
-      getFetchedFrom(resource.internal_acl.resourceAcl)
+      getSourceUrl(resource.internal_acl.resourceAcl)
   );
 }
 
@@ -194,7 +194,7 @@ export function getResourceAcl(
 /**
  * Verify whether a fallback ACL was found for the given Resource.
  *
- * A Resource fetched with its ACL (e.g. using [[fetchLitDatasetWithAcl]]) _might_ have a fallback ACL
+ * A Resource fetched with its ACL (e.g. using [[getSolidDatasetWithAcl]]) _might_ have a fallback ACL
  * attached, but we cannot be sure: the currently authenticated user (if any) might not have Control
  * access to one of the fetched Resource's Containers.
  *
@@ -203,7 +203,7 @@ export function getResourceAcl(
  * Please note that the Web Access Control specification is not yet finalised, and hence, this
  * function is still experimental and can change in a non-major release.
  *
- * @param resource A [[LitDataset]] that might have a fallback ACL attached.
+ * @param resource A [[SolidDataset]] that might have a fallback ACL attached.
  * @returns Whether `dataset` has a fallback ACL attached.
  */
 export function hasFallbackAcl<Resource extends WithAcl>(
@@ -246,10 +246,10 @@ export function createAcl(
   targetResource: WithResourceInfo & WithAccessibleAcl
 ): AclDataset {
   const emptyResourceAcl: AclDataset = Object.assign(dataset(), {
-    internal_accessTo: getFetchedFrom(targetResource),
+    internal_accessTo: getSourceUrl(targetResource),
     internal_resourceInfo: {
-      fetchedFrom: targetResource.internal_resourceInfo.aclUrl,
-      isLitDataset: true,
+      sourceIri: targetResource.internal_resourceInfo.aclUrl,
+      isRawData: false,
     },
   });
 
@@ -279,7 +279,7 @@ export function createAclFromFallbackAcl(
   );
   const resourceAclRules = defaultAclRules.map((rule) => {
     rule = removeAll(rule, acl.default);
-    rule = setIri(rule, acl.accessTo, getFetchedFrom(resource));
+    rule = setIri(rule, acl.accessTo, getSourceUrl(resource));
     return rule;
   });
 
@@ -294,7 +294,7 @@ export function createAclFromFallbackAcl(
 
 /** @internal */
 export function internal_isAclDataset(
-  dataset: LitDataset
+  dataset: SolidDataset
 ): dataset is AclDataset {
   return typeof (dataset as AclDataset).internal_accessTo === "string";
 }
@@ -315,7 +315,7 @@ export function internal_getResourceAclRules(aclRules: AclRule[]): AclRule[] {
 }
 
 function isResourceAclRule(aclRule: AclRule): boolean {
-  return getIriOne(aclRule, acl.accessTo) !== null;
+  return getIri(aclRule, acl.accessTo) !== null;
 }
 
 /** @internal */
@@ -336,7 +336,7 @@ export function internal_getDefaultAclRules(aclRules: AclRule[]): AclRule[] {
 }
 
 function isDefaultAclRule(aclRule: AclRule): boolean {
-  return getIriOne(aclRule, acl.default) !== null;
+  return getIri(aclRule, acl.default) !== null;
 }
 
 /** @internal */
@@ -421,22 +421,22 @@ function isEmptyAclRule(aclRule: AclRule): boolean {
 
   // If the rule does not apply to any Resource, it is no longer working:
   if (
-    getIriOne(aclRule, acl.accessTo) === null &&
-    getIriOne(aclRule, acl.default) === null
+    getIri(aclRule, acl.accessTo) === null &&
+    getIri(aclRule, acl.default) === null
   ) {
     return true;
   }
 
   // If the rule does not specify Access Modes, it is no longer working:
-  if (getIriOne(aclRule, acl.mode) === null) {
+  if (getIri(aclRule, acl.mode) === null) {
     return true;
   }
 
   // If the rule does not specify whom it applies to, it is no longer working:
   if (
-    getIriOne(aclRule, acl.agent) === null &&
-    getIriOne(aclRule, acl.agentGroup) === null &&
-    getIriOne(aclRule, acl.agentClass) === null
+    getIri(aclRule, acl.agent) === null &&
+    getIri(aclRule, acl.agentGroup) === null &&
+    getIri(aclRule, acl.agentClass) === null
   ) {
     return true;
   }
@@ -555,7 +555,7 @@ export async function saveAclFor(
     typeof internal_defaultFetchOptions
   > = internal_defaultFetchOptions
 ): Promise<AclDataset & WithResourceInfo> {
-  const savedDataset = await saveLitDatasetAt(
+  const savedDataset = await saveSolidDatasetAt(
     resource.internal_resourceInfo.aclUrl,
     resourceAcl,
     options
@@ -563,7 +563,7 @@ export async function saveAclFor(
   const savedAclDataset: AclDataset & typeof savedDataset = Object.assign(
     savedDataset,
     {
-      internal_accessTo: getFetchedFrom(resource),
+      internal_accessTo: getSourceUrl(resource),
     }
   );
 

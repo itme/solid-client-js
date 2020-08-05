@@ -21,23 +21,28 @@
 
 export {
   isContainer,
-  isLitDataset,
-  getFetchedFrom,
+  isRawData,
+  getSourceUrl,
+  getSourceIri,
   getContentType,
   fetchResourceInfoWithAcl,
   // Aliases for deprecated exports to preserve backwards compatibility:
   /** @deprecated See [[fetchResourceInfoWithAcl]] */
   fetchResourceInfoWithAcl as unstable_fetchResourceInfoWithAcl,
+  /** @deprecated See [[isRawData]] */
+  isRawData as isLitDataset,
+  /** @deprecated See [[getSourceUrl]] */
+  getSourceUrl as getFetchedFrom,
 } from "./resource/resource";
 export {
-  fetchFile,
-  fetchFileWithAcl,
+  getFile,
+  getFileWithAcl,
   deleteFile,
   saveFileInContainer,
   overwriteFile,
   // Aliases for deprecated exports to preserve backwards compatibility:
-  /** @deprecated See [[fetchFile]] */
-  fetchFile as unstable_fetchFile,
+  /** @deprecated See [[getFile]] */
+  getFile as unstable_fetchFile,
   /** @deprecated See [[deleteFile]] */
   deleteFile as unstable_deleteFile,
   /** @deprecated See [[saveFileContainer]] */
@@ -46,17 +51,27 @@ export {
   overwriteFile as unstable_overwriteFile,
 } from "./resource/nonRdfData";
 export {
-  createLitDataset,
-  fetchLitDataset,
-  saveLitDatasetAt,
-  saveLitDatasetInContainer,
-  fetchLitDatasetWithAcl,
+  createSolidDataset,
+  getSolidDataset,
+  saveSolidDatasetAt,
+  saveSolidDatasetInContainer,
+  getSolidDatasetWithAcl,
   // Aliases for deprecated exports to preserve backwards compatibility:
   /** @deprecated See [[fetchLitDatasetWithAcl]] */
-  fetchLitDatasetWithAcl as unstable_fetchLitDatasetWithAcl,
-} from "./resource/litDataset";
+  getSolidDatasetWithAcl as unstable_fetchLitDatasetWithAcl,
+  /** @deprecated See [[createSolidDataset]] */
+  createSolidDataset as createLitDataset,
+  /** @deprecated See [[getSolidDataset]] */
+  getSolidDataset as fetchLitDataset,
+  /** @deprecated See [[saveSolidDataset]] */
+  saveSolidDatasetAt as saveLitDatasetAt,
+  /** @deprecated See [[saveSolidDatasetInContainer]] */
+  saveSolidDatasetInContainer as saveLitDatasetInContainer,
+  /** @deprecated See [[getSolidDatasetWithAcl]] */
+  getSolidDatasetWithAcl as fetchLitDatasetWithAcl,
+} from "./resource/solidDataset";
 export {
-  getThingOne,
+  getThing,
   getThingAll,
   setThing,
   removeThing,
@@ -65,14 +80,14 @@ export {
   asIri,
 } from "./thing/thing";
 export {
-  getUrlOne,
-  getIriOne,
-  getBooleanOne,
-  getDatetimeOne,
-  getDecimalOne,
-  getIntegerOne,
-  getStringWithLocaleOne,
-  getStringNoLocaleOne,
+  getUrl,
+  getIri,
+  getBoolean,
+  getDatetime,
+  getDecimal,
+  getInteger,
+  getStringWithLocale,
+  getStringNoLocale,
   getUrlAll,
   getIriAll,
   getBooleanAll,
@@ -81,17 +96,17 @@ export {
   getIntegerAll,
   getStringWithLocaleAll,
   getStringNoLocaleAll,
-  getLiteralOne,
-  getNamedNodeOne,
+  getLiteral,
+  getNamedNode,
   getLiteralAll,
   getNamedNodeAll,
   // Aliases for deprecated exports to preserve backwards compatibility:
-  /** @deprecated See [[getStringNoLocaleOne]] */
-  getStringNoLocaleOne as getStringUnlocalizedOne,
+  /** @deprecated See [[getStringNoLocale]] */
+  getStringNoLocale as getStringUnlocalizedOne,
   /** @deprecated See [[getStringNoLocaleAll]] */
   getStringNoLocaleAll as getStringUnlocalizedAll,
-  /** @deprecated See [[getStringWithLocaleOne]] */
-  getStringWithLocaleOne as getStringInLocaleOne,
+  /** @deprecated See [[getStringWithLocale]] */
+  getStringWithLocale as getStringInLocaleOne,
   /** @deprecated See [[getStringWithLocaleAll]] */
   getStringWithLocaleAll as getStringInLocaleAll,
 } from "./thing/get";
@@ -176,52 +191,52 @@ export {
 } from "./acl/acl";
 export {
   AgentAccess,
-  getAgentAccessOne,
+  getAgentAccess,
   getAgentAccessAll,
-  getAgentResourceAccessOne,
+  getAgentResourceAccess,
   getAgentResourceAccessAll,
   setAgentResourceAccess,
-  getAgentDefaultAccessOne,
+  getAgentDefaultAccess,
   getAgentDefaultAccessAll,
   setAgentDefaultAccess,
   // Aliases for deprecated exports to preserve backwards compatibility:
   /** @deprecated See [[AgentAccess]] */
   AgentAccess as unstable_AgentAccess,
-  /** @deprecated See [[getAgentAccessOne]] */
-  getAgentAccessOne as unstable_getAgentAccessOne,
+  /** @deprecated See [[getAgentAccess]] */
+  getAgentAccess as unstable_getAgentAccessOne,
   /** @deprecated See [[getAgentAccessAll]] */
   getAgentAccessAll as unstable_getAgentAccessAll,
-  /** @deprecated See [[getAgentResourceAccessOne]] */
-  getAgentResourceAccessOne as unstable_getAgentResourceAccessOne,
+  /** @deprecated See [[getAgentResourceAccess]] */
+  getAgentResourceAccess as unstable_getAgentResourceAccessOne,
   /** @deprecated See [[getAgentResourceAccessAll]] */
   getAgentResourceAccessAll as unstable_getAgentResourceAccessAll,
   /** @deprecated See [[setAgentResourceAccess]] */
   setAgentResourceAccess as unstable_setAgentResourceAccess,
-  /** @deprecated See [[getAgentDefaultAccessOne]] */
-  getAgentDefaultAccessOne as unstable_getAgentDefaultAccessOne,
+  /** @deprecated See [[getAgentDefaultAccess]] */
+  getAgentDefaultAccess as unstable_getAgentDefaultAccessOne,
   /** @deprecated See [[getAgentDefaultAccessAll]] */
   getAgentDefaultAccessAll as unstable_getAgentDefaultAccessAll,
   /** @deprecated See [[setAgentResourceAccess]] */
   setAgentDefaultAccess as unstable_setAgentDefaultAccess,
 } from "./acl/agent";
 export {
-  getGroupAccessOne,
+  getGroupAccess,
   getGroupAccessAll,
-  getGroupResourceAccessOne,
+  getGroupResourceAccess,
   getGroupResourceAccessAll,
-  getGroupDefaultAccessOne,
+  getGroupDefaultAccess,
   getGroupDefaultAccessAll,
   // Aliases for deprecated exports to preserve backwards compatibility:
-  /** @deprecated See [[getGroupAccessOne]] */
-  getGroupAccessOne as unstable_getGroupAccessOne,
+  /** @deprecated See [[getGroupAccess]] */
+  getGroupAccess as unstable_getGroupAccessOne,
   /** @deprecated See [[getGroupAccessAll]] */
   getGroupAccessAll as unstable_getGroupAccessAll,
-  /** @deprecated See [[getGroupResourceAccessOne]] */
-  getGroupResourceAccessOne as unstable_getGroupResourceAccessOne,
+  /** @deprecated See [[getGroupResourceAccess]] */
+  getGroupResourceAccess as unstable_getGroupResourceAccessOne,
   /** @deprecated See [[getGroupResourceAccessAll]] */
   getGroupResourceAccessAll as unstable_getGroupResourceAccessAll,
-  /** @deprecated See [[getGroupDefaultAccessOne]] */
-  getGroupDefaultAccessOne as unstable_getGroupDefaultAccessOne,
+  /** @deprecated See [[getGroupDefaultAccess]] */
+  getGroupDefaultAccess as unstable_getGroupDefaultAccessOne,
   /** @deprecated See [[getGroupDefaultAccessAll]] */
   getGroupDefaultAccessAll as unstable_getGroupDefaultAccessAll,
 } from "./acl/group";
@@ -249,7 +264,7 @@ export {
   UrlString,
   IriString,
   WebId,
-  LitDataset,
+  SolidDataset,
   Thing,
   ThingPersisted,
   ThingLocal,
@@ -284,4 +299,6 @@ export {
   Access as unstable_Access,
   /** @deprecated See [[UploadRequestInit]] */
   UploadRequestInit as unstable_UploadRequestInit,
+  /** @deprecated See [[SolidDataset]] */
+  SolidDataset as LitDataset,
 } from "./interfaces";

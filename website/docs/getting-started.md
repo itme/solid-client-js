@@ -33,9 +33,9 @@ If you are looking for a more thorough introduction, you can work your way throu
 ### Fetching data
 
 ```typescript
-import { fetchLitDataset } from "@inrupt/solid-client";
+import { getSolidDataset } from "@inrupt/solid-client";
 
-const profileResource = await fetchLitDataset(
+const profileResource = await getSolidDataset(
   "https://vincentt.inrupt.net/profile/card"
 );
 ```
@@ -43,14 +43,14 @@ const profileResource = await fetchLitDataset(
 ### Reading data
 
 ```typescript
-import { getThingOne, getStringNoLocaleOne } from "@inrupt/solid-client";
+import { getThing, getStringNoLocale } from "@inrupt/solid-client";
 import { foaf } from "rdf-namespaces";
 
-const profile = getThingOne(
+const profile = getThing(
   profileResource,
   "https://vincentt.inrupt.net/profile/card#me"
 );
-const name = getStringNoLocaleOne(profileResource, foaf.name);
+const name = getStringNoLocale(profileResource, foaf.name);
 ```
 
 For more details, see [Working with Data](./tutorials/working-with-data.md#reading-data).
@@ -61,14 +61,14 @@ For more details, see [Working with Data](./tutorials/working-with-data.md#readi
 import {
   setStringUnlocalised,
   setThing,
-  saveLitDatasetAt,
+  saveSolidDatasetAt,
 } from "@inrupt/solid-client";
 import { foaf } from "rdf-namespaces";
 
 const updatedProfile = setStringUnlocalised(profile, foaf.name, "Vincent");
 const updatedProfileResource = setThing(profileDoc, updatedProfile);
 
-await saveLitDatasetAt(
+await saveSolidDatasetAt(
   "https://vincentt.inrupt.net/profile/card",
   updatedProfileResource
 );

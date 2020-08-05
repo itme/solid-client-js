@@ -32,15 +32,15 @@ jest.mock("../fetcher", () => ({
 }));
 
 import {
-  fetchFile,
+  getFile,
   deleteFile,
   saveFileInContainer,
   overwriteFile,
-  fetchFileWithAcl,
+  getFileWithAcl,
 } from "./nonRdfData";
 import { Headers, Response } from "cross-fetch";
 
-describe("fetchFile", () => {
+describe("getFile", () => {
   it("should GET a remote resource using the included fetcher if no other fetcher is available", async () => {
     const fetcher = jest.requireMock("../fetcher") as {
       fetch: jest.Mock<
@@ -55,7 +55,7 @@ describe("fetchFile", () => {
       )
     );
 
-    await fetchFile("https://some.url");
+    await getFile("https://some.url");
     expect(fetcher.fetch.mock.calls).toEqual([["https://some.url", undefined]]);
   });
 
@@ -68,7 +68,7 @@ describe("fetchFile", () => {
         )
       );
 
-    await fetchFile("https://some.url", {
+    await getFile("https://some.url", {
       fetch: mockFetch,
     });
 
@@ -86,13 +86,13 @@ describe("fetchFile", () => {
       .fn(window.fetch)
       .mockReturnValue(Promise.resolve(new Response("Some data", init)));
 
-    const file = await fetchFile("https://some.url", {
+    const file = await getFile("https://some.url", {
       fetch: mockFetch,
     });
 
-    expect(file.internal_resourceInfo.fetchedFrom).toEqual("https://some.url");
+    expect(file.internal_resourceInfo.sourceIri).toEqual("https://some.url");
     expect(file.internal_resourceInfo.contentType).toContain("text/plain");
-    expect(file.internal_resourceInfo.isLitDataset).toEqual(false);
+    expect(file.internal_resourceInfo.isRawData).toBe(true);
 
     const fileData = await file.text();
     expect(fileData).toEqual("Some data");
@@ -107,7 +107,7 @@ describe("fetchFile", () => {
         )
       );
 
-    const response = await fetchFile("https://some.url", {
+    const response = await getFile("https://some.url", {
       init: {
         headers: new Headers({ Accept: "text/turtle" }),
       },
@@ -133,7 +133,7 @@ describe("fetchFile", () => {
         )
       );
 
-    const response = fetchFile("https://some.url", {
+    const response = getFile("https://some.url", {
       fetch: mockFetch,
     });
     await expect(response).rejects.toThrow(
@@ -142,7 +142,7 @@ describe("fetchFile", () => {
   });
 });
 
-describe("fetchFileWithAcl", () => {
+describe("getFileWithAcl", () => {
   it("should GET a remote resource using the included fetcher if no other fetcher is available", async () => {
     const fetcher = jest.requireMock("../fetcher") as {
       fetch: jest.Mock<
@@ -157,7 +157,7 @@ describe("fetchFileWithAcl", () => {
       )
     );
 
-    await fetchFileWithAcl("https://some.url");
+    await getFileWithAcl("https://some.url");
     expect(fetcher.fetch.mock.calls).toEqual([["https://some.url", undefined]]);
   });
 
@@ -170,7 +170,7 @@ describe("fetchFileWithAcl", () => {
         )
       );
 
-    const response = await fetchFileWithAcl("https://some.url", {
+    const response = await getFileWithAcl("https://some.url", {
       fetch: mockFetch,
     });
 
@@ -188,13 +188,13 @@ describe("fetchFileWithAcl", () => {
       .fn(window.fetch)
       .mockReturnValue(Promise.resolve(new Response("Some data", init)));
 
-    const file = await fetchFileWithAcl("https://some.url", {
+    const file = await getFileWithAcl("https://some.url", {
       fetch: mockFetch,
     });
 
-    expect(file.internal_resourceInfo.fetchedFrom).toEqual("https://some.url");
+    expect(file.internal_resourceInfo.sourceIri).toEqual("https://some.url");
     expect(file.internal_resourceInfo.contentType).toContain("text/plain");
-    expect(file.internal_resourceInfo.isLitDataset).toEqual(false);
+    expect(file.internal_resourceInfo.isRawData).toBe(true);
 
     const fileData = await file.text();
     expect(fileData).toEqual("Some data");
@@ -215,21 +215,21 @@ describe("fetchFileWithAcl", () => {
       return Promise.resolve(new Response(undefined, init));
     });
 
-    const fetchedLitDataset = await fetchFileWithAcl(
+    const fetchedSolidDataset = await getFileWithAcl(
       "https://some.pod/resource",
       { fetch: mockFetch }
     );
 
-    expect(fetchedLitDataset.internal_resourceInfo.fetchedFrom).toBe(
+    expect(fetchedSolidDataset.internal_resourceInfo.sourceIri).toBe(
       "https://some.pod/resource"
     );
     expect(
-      fetchedLitDataset.internal_acl?.resourceAcl?.internal_resourceInfo
-        .fetchedFrom
+      fetchedSolidDataset.internal_acl?.resourceAcl?.internal_resourceInfo
+        .sourceIri
     ).toBe("https://some.pod/resource.acl");
     expect(
-      fetchedLitDataset.internal_acl?.fallbackAcl?.internal_resourceInfo
-        .fetchedFrom
+      fetchedSolidDataset.internal_acl?.fallbackAcl?.internal_resourceInfo
+        .sourceIri
     ).toBe("https://some.pod/.acl");
     expect(mockFetch.mock.calls).toHaveLength(4);
     expect(mockFetch.mock.calls[0][0]).toBe("https://some.pod/resource");
@@ -250,14 +250,14 @@ describe("fetchFileWithAcl", () => {
       Promise.resolve(new Response(undefined, init))
     );
 
-    const fetchedLitDataset = await fetchFileWithAcl(
+    const fetchedSolidDataset = await getFileWithAcl(
       "https://some.pod/resource",
       { fetch: mockFetch }
     );
 
     expect(mockFetch.mock.calls).toHaveLength(1);
-    expect(fetchedLitDataset.internal_acl.resourceAcl).toBeNull();
-    expect(fetchedLitDataset.internal_acl.fallbackAcl).toBeNull();
+    expect(fetchedSolidDataset.internal_acl.resourceAcl).toBeNull();
+    expect(fetchedSolidDataset.internal_acl.fallbackAcl).toBeNull();
   });
 
   it("returns a meaningful error when the server returns a 403", async () => {
@@ -267,7 +267,7 @@ describe("fetchFileWithAcl", () => {
         Promise.resolve(new Response("Not allowed", { status: 403 }))
       );
 
-    const fetchPromise = fetchFileWithAcl("https://arbitrary.pod/resource", {
+    const fetchPromise = getFileWithAcl("https://arbitrary.pod/resource", {
       fetch: mockFetch,
     });
 
@@ -283,7 +283,7 @@ describe("fetchFileWithAcl", () => {
         Promise.resolve(new Response("Not found", { status: 404 }))
       );
 
-    const fetchPromise = fetchFileWithAcl("https://arbitrary.pod/resource", {
+    const fetchPromise = getFileWithAcl("https://arbitrary.pod/resource", {
       fetch: mockFetch,
     });
 
@@ -301,7 +301,7 @@ describe("fetchFileWithAcl", () => {
         )
       );
 
-    const response = await fetchFile("https://some.url", {
+    const response = await getFile("https://some.url", {
       init: {
         headers: new Headers({ Accept: "text/turtle" }),
       },
@@ -327,7 +327,7 @@ describe("fetchFileWithAcl", () => {
         )
       );
 
-    const response = fetchFile("https://some.url", {
+    const response = getFile("https://some.url", {
       fetch: mockFetch,
     });
     await expect(response).rejects.toThrow(
@@ -493,8 +493,8 @@ describe("Write non-RDF data into a folder", () => {
     expect(mockCall[1]?.body).toEqual(mockBlob);
     expect(savedFile).toBeInstanceOf(Blob);
     expect(savedFile.internal_resourceInfo).toEqual({
-      fetchedFrom: "https://some.url/someFileName",
-      isLitDataset: false,
+      sourceIri: "https://some.url/someFileName",
+      isRawData: true,
     });
   });
 
@@ -674,8 +674,8 @@ describe("Write non-RDF data directly into a resource (potentially erasing previ
 
     expect(savedFile).toBeInstanceOf(Blob);
     expect(savedFile.internal_resourceInfo).toEqual({
-      fetchedFrom: "https://some.url",
-      isLitDataset: false,
+      sourceIri: "https://some.url",
+      isRawData: true,
     });
   });
 
@@ -718,8 +718,8 @@ describe("Write non-RDF data directly into a resource (potentially erasing previ
 
     expect(savedFile).toBeInstanceOf(Blob);
     expect(savedFile.internal_resourceInfo).toEqual({
-      fetchedFrom: "https://some.url",
-      isLitDataset: false,
+      sourceIri: "https://some.url",
+      isRawData: true,
     });
   });
 

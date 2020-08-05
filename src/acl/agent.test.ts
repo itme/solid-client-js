@@ -24,17 +24,17 @@ import { Quad } from "rdf-js";
 import { dataset, namedNode, literal } from "@rdfjs/dataset";
 import { DataFactory } from "n3";
 import {
-  getAgentResourceAccessOne,
+  getAgentResourceAccess,
   getAgentResourceAccessAll,
-  getAgentDefaultAccessOne,
+  getAgentDefaultAccess,
   getAgentDefaultAccessAll,
   setAgentResourceAccess,
-  getAgentAccessOne,
+  getAgentAccess,
   getAgentAccessAll,
   setAgentDefaultAccess,
 } from "./agent";
 import {
-  LitDataset,
+  SolidDataset,
   Access,
   WithAcl,
   WithResourceInfo,
@@ -45,7 +45,7 @@ import { getThingAll } from "../thing/thing";
 import { getIriAll } from "../thing/get";
 
 function addAclRuleQuads(
-  aclDataset: LitDataset & WithResourceInfo,
+  aclDataset: SolidDataset & WithResourceInfo,
   agent: IriString,
   resource: IriString,
   access: Access,
@@ -123,39 +123,39 @@ function addAclRuleQuads(
   return Object.assign(aclDataset, { internal_accessTo: resource });
 }
 
-function addAclDatasetToLitDataset(
-  litDataset: LitDataset & WithResourceInfo,
+function addAclDatasetToSolidDataset(
+  solidDataset: SolidDataset & WithResourceInfo,
   aclDataset: AclDataset,
   type: "resource" | "fallback"
-): LitDataset & WithResourceInfo & WithAcl {
+): SolidDataset & WithResourceInfo & WithAcl {
   const acl: WithAcl["internal_acl"] = {
     fallbackAcl: null,
     resourceAcl: null,
-    ...(((litDataset as any) as WithAcl).internal_acl ?? {}),
+    ...(((solidDataset as any) as WithAcl).internal_acl ?? {}),
   };
   if (type === "resource") {
-    litDataset.internal_resourceInfo.aclUrl =
-      aclDataset.internal_resourceInfo.fetchedFrom;
-    aclDataset.internal_accessTo = litDataset.internal_resourceInfo.fetchedFrom;
+    solidDataset.internal_resourceInfo.aclUrl =
+      aclDataset.internal_resourceInfo.sourceIri;
+    aclDataset.internal_accessTo = solidDataset.internal_resourceInfo.sourceIri;
     acl.resourceAcl = aclDataset;
   } else if (type === "fallback") {
     acl.fallbackAcl = aclDataset;
   }
-  return Object.assign(litDataset, { internal_acl: acl });
+  return Object.assign(solidDataset, { internal_acl: acl });
 }
 
-function getMockDataset(fetchedFrom: IriString): LitDataset & WithResourceInfo {
+function getMockDataset(sourceIri: IriString): SolidDataset & WithResourceInfo {
   return Object.assign(dataset(), {
     internal_resourceInfo: {
-      fetchedFrom: fetchedFrom,
-      isLitDataset: true,
+      sourceIri: sourceIri,
+      isRawData: false,
     },
   });
 }
 
-describe("getAgentAccessOne", () => {
+describe("getGroupAccess", () => {
   it("returns the Resource's own applicable ACL rules", () => {
-    const litDataset = getMockDataset("https://some.pod/container/resource");
+    const solidDataset = getMockDataset("https://some.pod/container/resource");
     const resourceAcl = addAclRuleQuads(
       getMockDataset("https://some.pod/container/resource.acl"),
       "https://some.pod/profileDoc#webId",
@@ -163,14 +163,14 @@ describe("getAgentAccessOne", () => {
       { read: false, append: false, write: false, control: true },
       "resource"
     );
-    const litDatasetWithAcl = addAclDatasetToLitDataset(
-      litDataset,
+    const solidDatasetWithAcl = addAclDatasetToSolidDataset(
+      solidDataset,
       resourceAcl,
       "resource"
     );
 
-    const access = getAgentAccessOne(
-      litDatasetWithAcl,
+    const access = getAgentAccess(
+      solidDatasetWithAcl,
       "https://some.pod/profileDoc#webId"
     );
 
@@ -182,8 +182,8 @@ describe("getAgentAccessOne", () => {
     });
   });
 
-  it("returns the fallback ACL rules if no Resource ACL LitDataset is available", () => {
-    const litDataset = getMockDataset("https://some.pod/container/resource");
+  it("returns the fallback ACL rules if no Resource ACL SolidDataset is available", () => {
+    const solidDataset = getMockDataset("https://some.pod/container/resource");
     const fallbackAcl = addAclRuleQuads(
       getMockDataset("https://some.pod/container/.acl"),
       "https://some.pod/profileDoc#webId",
@@ -191,14 +191,14 @@ describe("getAgentAccessOne", () => {
       { read: false, append: false, write: false, control: true },
       "default"
     );
-    const litDatasetWithAcl = addAclDatasetToLitDataset(
-      litDataset,
+    const solidDatasetWithAcl = addAclDatasetToSolidDataset(
+      solidDataset,
       fallbackAcl,
       "fallback"
     );
 
-    const access = getAgentAccessOne(
-      litDatasetWithAcl,
+    const access = getAgentAccess(
+      solidDatasetWithAcl,
       "https://some.pod/profileDoc#webId"
     );
 
@@ -211,25 +211,25 @@ describe("getAgentAccessOne", () => {
   });
 
   it("returns null if neither the Resource's own nor a fallback ACL was accessible", () => {
-    const litDataset = getMockDataset("https://some.pod/container/resource");
+    const solidDataset = getMockDataset("https://some.pod/container/resource");
     const inaccessibleAcl: WithAcl = {
       internal_acl: { fallbackAcl: null, resourceAcl: null },
     };
-    const litDatasetWithInaccessibleAcl = Object.assign(
-      litDataset,
+    const solidDatasetWithInaccessibleAcl = Object.assign(
+      solidDataset,
       inaccessibleAcl
     );
 
     expect(
-      getAgentAccessOne(
-        litDatasetWithInaccessibleAcl,
+      getAgentAccess(
+        solidDatasetWithInaccessibleAcl,
         "https://arbitrary.pod/profileDoc#webId"
       )
     ).toBeNull();
   });
 
-  it("ignores the fallback ACL rules if a Resource ACL LitDataset is available", () => {
-    const litDataset = getMockDataset("https://some.pod/container/resource");
+  it("ignores the fallback ACL rules if a Resource ACL SolidDataset is available", () => {
+    const solidDataset = getMockDataset("https://some.pod/container/resource");
     const resourceAcl = addAclRuleQuads(
       getMockDataset("https://some.pod/container/resource.acl"),
       "https://some.pod/profileDoc#webId",
@@ -244,19 +244,19 @@ describe("getAgentAccessOne", () => {
       { read: false, append: false, write: false, control: true },
       "default"
     );
-    const litDatasetWithJustResourceAcl = addAclDatasetToLitDataset(
-      litDataset,
+    const solidDatasetWithJustResourceAcl = addAclDatasetToSolidDataset(
+      solidDataset,
       resourceAcl,
       "resource"
     );
-    const litDatasetWithAcl = addAclDatasetToLitDataset(
-      litDatasetWithJustResourceAcl,
+    const solidDatasetWithAcl = addAclDatasetToSolidDataset(
+      solidDatasetWithJustResourceAcl,
       fallbackAcl,
       "fallback"
     );
 
-    const access = getAgentAccessOne(
-      litDatasetWithAcl,
+    const access = getAgentAccess(
+      solidDatasetWithAcl,
       "https://some.pod/profileDoc#webId"
     );
 
@@ -268,8 +268,8 @@ describe("getAgentAccessOne", () => {
     });
   });
 
-  it("ignores default ACL rules from the Resource's own ACL LitDataset", () => {
-    const litDataset = getMockDataset("https://some.pod/container/");
+  it("ignores default ACL rules from the Resource's own ACL SolidDataset", () => {
+    const solidDataset = getMockDataset("https://some.pod/container/");
     const resourceAcl = addAclRuleQuads(
       getMockDataset("https://some.pod/container/.acl"),
       "https://some.pod/profileDoc#webId",
@@ -284,14 +284,14 @@ describe("getAgentAccessOne", () => {
       { read: false, append: false, write: false, control: true },
       "default"
     );
-    const litDatasetWithAcl = addAclDatasetToLitDataset(
-      litDataset,
+    const solidDatasetWithAcl = addAclDatasetToSolidDataset(
+      solidDataset,
       resourceAclWithDefaultRules,
       "resource"
     );
 
-    const access = getAgentAccessOne(
-      litDatasetWithAcl,
+    const access = getAgentAccess(
+      solidDatasetWithAcl,
       "https://some.pod/profileDoc#webId"
     );
 
@@ -303,8 +303,8 @@ describe("getAgentAccessOne", () => {
     });
   });
 
-  it("ignores Resource ACL rules from the fallback ACL LitDataset", () => {
-    const litDataset = getMockDataset("https://some.pod/container/resource");
+  it("ignores Resource ACL rules from the fallback ACL SolidDataset", () => {
+    const solidDataset = getMockDataset("https://some.pod/container/resource");
     const fallbackAcl = addAclRuleQuads(
       getMockDataset("https://some.pod/container/.acl"),
       "https://some.pod/profileDoc#webId",
@@ -319,14 +319,14 @@ describe("getAgentAccessOne", () => {
       { read: false, append: false, write: false, control: true },
       "default"
     );
-    const litDatasetWithAcl = addAclDatasetToLitDataset(
-      litDataset,
+    const solidDatasetWithAcl = addAclDatasetToSolidDataset(
+      solidDataset,
       fallbackAclWithDefaultRules,
       "fallback"
     );
 
-    const access = getAgentAccessOne(
-      litDatasetWithAcl,
+    const access = getAgentAccess(
+      solidDatasetWithAcl,
       "https://some.pod/profileDoc#webId"
     );
 
@@ -341,7 +341,7 @@ describe("getAgentAccessOne", () => {
 
 describe("getAgentAccessAll", () => {
   it("returns the Resource's own applicable ACL rules, grouped by Agent", () => {
-    const litDataset = getMockDataset("https://some.pod/container/resource");
+    const solidDataset = getMockDataset("https://some.pod/container/resource");
     const resourceAcl = addAclRuleQuads(
       getMockDataset("https://some.pod/container/resource.acl"),
       "https://some.pod/profileDoc#webId",
@@ -349,13 +349,13 @@ describe("getAgentAccessAll", () => {
       { read: false, append: false, write: false, control: true },
       "resource"
     );
-    const litDatasetWithAcl = addAclDatasetToLitDataset(
-      litDataset,
+    const solidDatasetWithAcl = addAclDatasetToSolidDataset(
+      solidDataset,
       resourceAcl,
       "resource"
     );
 
-    const access = getAgentAccessAll(litDatasetWithAcl);
+    const access = getAgentAccessAll(solidDatasetWithAcl);
 
     expect(access).toEqual({
       "https://some.pod/profileDoc#webId": {
@@ -367,8 +367,8 @@ describe("getAgentAccessAll", () => {
     });
   });
 
-  it("returns the fallback ACL rules if no Resource ACL LitDataset is available", () => {
-    const litDataset = getMockDataset("https://some.pod/container/resource");
+  it("returns the fallback ACL rules if no Resource ACL SolidDataset is available", () => {
+    const solidDataset = getMockDataset("https://some.pod/container/resource");
     const fallbackAcl = addAclRuleQuads(
       getMockDataset("https://some.pod/container/.acl"),
       "https://some.pod/profileDoc#webId",
@@ -376,13 +376,13 @@ describe("getAgentAccessAll", () => {
       { read: false, append: false, write: false, control: true },
       "default"
     );
-    const litDatasetWithAcl = addAclDatasetToLitDataset(
-      litDataset,
+    const solidDatasetWithAcl = addAclDatasetToSolidDataset(
+      solidDataset,
       fallbackAcl,
       "fallback"
     );
 
-    const access = getAgentAccessAll(litDatasetWithAcl);
+    const access = getAgentAccessAll(solidDatasetWithAcl);
 
     expect(access).toEqual({
       "https://some.pod/profileDoc#webId": {
@@ -395,20 +395,20 @@ describe("getAgentAccessAll", () => {
   });
 
   it("returns null if neither the Resource's own nor a fallback ACL was accessible", () => {
-    const litDataset = getMockDataset("https://some.pod/container/resource");
+    const solidDataset = getMockDataset("https://some.pod/container/resource");
     const inaccessibleAcl: WithAcl = {
       internal_acl: { fallbackAcl: null, resourceAcl: null },
     };
-    const litDatasetWithInaccessibleAcl = Object.assign(
-      litDataset,
+    const solidDatasetWithInaccessibleAcl = Object.assign(
+      solidDataset,
       inaccessibleAcl
     );
 
-    expect(getAgentAccessAll(litDatasetWithInaccessibleAcl)).toBeNull();
+    expect(getAgentAccessAll(solidDatasetWithInaccessibleAcl)).toBeNull();
   });
 
-  it("ignores the fallback ACL rules if a Resource ACL LitDataset is available", () => {
-    const litDataset = getMockDataset("https://some.pod/container/resource");
+  it("ignores the fallback ACL rules if a Resource ACL SolidDataset is available", () => {
+    const solidDataset = getMockDataset("https://some.pod/container/resource");
     const resourceAcl = addAclRuleQuads(
       getMockDataset("https://some.pod/container/resource.acl"),
       "https://some.pod/profileDoc#webId",
@@ -423,18 +423,18 @@ describe("getAgentAccessAll", () => {
       { read: false, append: false, write: false, control: true },
       "default"
     );
-    const litDatasetWithJustResourceAcl = addAclDatasetToLitDataset(
-      litDataset,
+    const solidDatasetWithJustResourceAcl = addAclDatasetToSolidDataset(
+      solidDataset,
       resourceAcl,
       "resource"
     );
-    const litDatasetWithAcl = addAclDatasetToLitDataset(
-      litDatasetWithJustResourceAcl,
+    const solidDatasetWithAcl = addAclDatasetToSolidDataset(
+      solidDatasetWithJustResourceAcl,
       fallbackAcl,
       "fallback"
     );
 
-    const access = getAgentAccessAll(litDatasetWithAcl);
+    const access = getAgentAccessAll(solidDatasetWithAcl);
 
     expect(access).toEqual({
       "https://some.pod/profileDoc#webId": {
@@ -447,7 +447,7 @@ describe("getAgentAccessAll", () => {
   });
 
   it("does not merge fallback ACL rules with a Resource's own ACL rules, if available", () => {
-    const litDataset = getMockDataset("https://some.pod/container/resource");
+    const solidDataset = getMockDataset("https://some.pod/container/resource");
     const resourceAcl = addAclRuleQuads(
       getMockDataset("https://some.pod/container/resource.acl"),
       "https://some.pod/profileDoc#webId",
@@ -462,18 +462,18 @@ describe("getAgentAccessAll", () => {
       { read: false, append: false, write: false, control: true },
       "default"
     );
-    const litDatasetWithJustResourceAcl = addAclDatasetToLitDataset(
-      litDataset,
+    const solidDatasetWithJustResourceAcl = addAclDatasetToSolidDataset(
+      solidDataset,
       resourceAcl,
       "resource"
     );
-    const litDatasetWithAcl = addAclDatasetToLitDataset(
-      litDatasetWithJustResourceAcl,
+    const solidDatasetWithAcl = addAclDatasetToSolidDataset(
+      solidDatasetWithJustResourceAcl,
       fallbackAcl,
       "fallback"
     );
 
-    const access = getAgentAccessAll(litDatasetWithAcl);
+    const access = getAgentAccessAll(solidDatasetWithAcl);
 
     // It only includes rules for agent "https://some.pod/profileDoc#webId",
     // not for "https://some-other.pod/profileDoc#webId"
@@ -487,8 +487,8 @@ describe("getAgentAccessAll", () => {
     });
   });
 
-  it("ignores default ACL rules from the Resource's own ACL LitDataset", () => {
-    const litDataset = getMockDataset("https://some.pod/container/");
+  it("ignores default ACL rules from the Resource's own ACL SolidDataset", () => {
+    const solidDataset = getMockDataset("https://some.pod/container/");
     const resourceAcl = addAclRuleQuads(
       getMockDataset("https://some.pod/container/.acl"),
       "https://some.pod/profileDoc#webId",
@@ -503,13 +503,13 @@ describe("getAgentAccessAll", () => {
       { read: false, append: false, write: false, control: true },
       "default"
     );
-    const litDatasetWithAcl = addAclDatasetToLitDataset(
-      litDataset,
+    const solidDatasetWithAcl = addAclDatasetToSolidDataset(
+      solidDataset,
       resourceAclWithDefaultRules,
       "resource"
     );
 
-    const access = getAgentAccessAll(litDatasetWithAcl);
+    const access = getAgentAccessAll(solidDatasetWithAcl);
 
     expect(access).toEqual({
       "https://some.pod/profileDoc#webId": {
@@ -521,8 +521,8 @@ describe("getAgentAccessAll", () => {
     });
   });
 
-  it("ignores Resource ACL rules from the fallback ACL LitDataset", () => {
-    const litDataset = getMockDataset("https://some.pod/container/resource");
+  it("ignores Resource ACL rules from the fallback ACL SolidDataset", () => {
+    const solidDataset = getMockDataset("https://some.pod/container/resource");
     const fallbackAcl = addAclRuleQuads(
       getMockDataset("https://some.pod/container/.acl"),
       "https://some.pod/profileDoc#webId",
@@ -537,13 +537,13 @@ describe("getAgentAccessAll", () => {
       { read: false, append: false, write: false, control: true },
       "default"
     );
-    const litDatasetWithAcl = addAclDatasetToLitDataset(
-      litDataset,
+    const solidDatasetWithAcl = addAclDatasetToSolidDataset(
+      solidDataset,
       fallbackAclWithDefaultRules,
       "fallback"
     );
 
-    const access = getAgentAccessAll(litDatasetWithAcl);
+    const access = getAgentAccessAll(solidDatasetWithAcl);
 
     expect(access).toEqual({
       "https://some.pod/profileDoc#webId": {
@@ -556,7 +556,7 @@ describe("getAgentAccessAll", () => {
   });
 });
 
-describe("getAgentResourceAccessOne", () => {
+describe("getAgentResourceAccess", () => {
   it("returns the applicable Access Modes for a single Agent", () => {
     const resourceAcl = addAclRuleQuads(
       getMockDataset("https://arbitrary.pod/resource.acl"),
@@ -566,7 +566,7 @@ describe("getAgentResourceAccessOne", () => {
       "resource"
     );
 
-    const agentAccess = getAgentResourceAccessOne(
+    const agentAccess = getAgentResourceAccess(
       resourceAcl,
       "https://some.pod/profileDoc#webId"
     );
@@ -595,7 +595,7 @@ describe("getAgentResourceAccessOne", () => {
       "resource"
     );
 
-    const agentAccess = getAgentResourceAccessOne(
+    const agentAccess = getAgentResourceAccess(
       resourceAcl,
       "https://some.pod/profileDoc#webId"
     );
@@ -617,7 +617,7 @@ describe("getAgentResourceAccessOne", () => {
       "resource"
     );
 
-    const agentAccess = getAgentResourceAccessOne(
+    const agentAccess = getAgentResourceAccess(
       resourceAcl,
       "https://some-other.pod/profileDoc#webId"
     );
@@ -646,7 +646,7 @@ describe("getAgentResourceAccessOne", () => {
       "resource"
     );
 
-    const agentAccess = getAgentResourceAccessOne(
+    const agentAccess = getAgentResourceAccess(
       resourceAcl,
       "https://some.pod/profileDoc#webId"
     );
@@ -675,7 +675,7 @@ describe("getAgentResourceAccessOne", () => {
       "resource"
     );
 
-    const agentAccess = getAgentResourceAccessOne(
+    const agentAccess = getAgentResourceAccess(
       resourceAcl,
       "https://arbitrary.pod/profileDoc#webId"
     );
@@ -1035,7 +1035,7 @@ describe("setAgentResourceAccess", () => {
     expect(updatedQuads).toHaveLength(17);
   });
 
-  it("does not alter the input LitDataset", () => {
+  it("does not alter the input SolidDataset", () => {
     const sourceDataset = Object.assign(
       getMockDataset("https://arbitrary.pod/resource.acl"),
       { internal_accessTo: "https://arbitrary.pod/resource" }
@@ -1511,7 +1511,7 @@ describe("setAgentResourceAccess", () => {
   });
 });
 
-describe("getAgentDefaultAccessOne", () => {
+describe("getAgentDefaultAccess", () => {
   it("returns the applicable Access Modes for a single Agent", () => {
     const containerAcl = addAclRuleQuads(
       getMockDataset("https://arbitrary.pod/container/.acl"),
@@ -1521,7 +1521,7 @@ describe("getAgentDefaultAccessOne", () => {
       "default"
     );
 
-    const agentAccess = getAgentDefaultAccessOne(
+    const agentAccess = getAgentDefaultAccess(
       containerAcl,
       "https://some.pod/profileDoc#webId"
     );
@@ -1550,7 +1550,7 @@ describe("getAgentDefaultAccessOne", () => {
       "default"
     );
 
-    const agentAccess = getAgentDefaultAccessOne(
+    const agentAccess = getAgentDefaultAccess(
       containerAcl,
       "https://some.pod/profileDoc#webId"
     );
@@ -1572,7 +1572,7 @@ describe("getAgentDefaultAccessOne", () => {
       "default"
     );
 
-    const agentAccess = getAgentDefaultAccessOne(
+    const agentAccess = getAgentDefaultAccess(
       containerAcl,
       "https://some-other.pod/profileDoc#webId"
     );
@@ -1601,7 +1601,7 @@ describe("getAgentDefaultAccessOne", () => {
       "default"
     );
 
-    const agentAccess = getAgentDefaultAccessOne(
+    const agentAccess = getAgentDefaultAccess(
       containerAcl,
       "https://some.pod/profileDoc#webId"
     );
@@ -1630,7 +1630,7 @@ describe("getAgentDefaultAccessOne", () => {
       "default"
     );
 
-    const agentAccess = getAgentDefaultAccessOne(
+    const agentAccess = getAgentDefaultAccess(
       containerAcl,
       "https://arbitrary.pod/profileDoc#webId"
     );
@@ -1992,7 +1992,7 @@ describe("setAgentDefaultAccess", () => {
     expect(updatedQuads).toHaveLength(17);
   });
 
-  it("does not alter the input LitDataset", () => {
+  it("does not alter the input SolidDataset", () => {
     const sourceDataset = Object.assign(
       getMockDataset("https://arbitrary.pod/container/.acl"),
       { internal_accessTo: "https://arbitrary.pod/container/" }
