@@ -27,13 +27,18 @@ import {
   WithResourceInfo,
   IriString,
   UrlString,
+  WebId,
+  WithChangeLog,
 } from "../interfaces";
 import {
   internal_getAclRules,
   internal_getDefaultAclRulesForResource,
+  internal_duplicateAclRule,
+  internal_initialiseAclRule,
   internal_getAccess,
   internal_combineAccessModes,
   internal_getResourceAclRulesForResource,
+  internal_removeEmptyAclRules,
   hasResourceAcl,
   hasFallbackAcl,
   getResourceAcl,
@@ -41,6 +46,10 @@ import {
   internal_getAclRulesForIri,
   internal_getAccessByIri,
 } from "./acl";
+import { getThingAll, setThing } from "../thing/thing";
+import { removeIri, removeAll } from "../thing/remove";
+import { getIriAll } from "../thing/get";
+import { setIri } from "../thing/set";
 
 import { acl } from "../constants";
 
@@ -201,4 +210,76 @@ function getGroupAclRuleForGroup(
 
 function getAccessByGroup(aclRules: AclRule[]): Record<IriString, Access> {
   return internal_getAccessByIri(aclRules, acl.agentGroup);
+}
+
+export function setGroupResourceAccess(
+  aclDataset: AclDataset,
+  group: WebId,
+  access: Access
+): AclDataset & WithChangeLog {
+  // First make sure that none of the pre-existing rules in the given ACL SolidDataset
+  // give the Group access to the Resource:
+  let filteredAcl = aclDataset;
+  getThingAll(aclDataset).forEach((aclRule) => {
+    // Obtain both the Rule that no longer includes the given Group,
+    // and a new Rule that includes all ACL Quads
+    // that do not pertain to the given Group-Resource combination.
+    // Note that usually, the latter will no longer include any meaningful statements;
+    // we'll clean them up afterwards.
+    const [filteredRule, remainingRule] = removeGroupFromRule(
+      aclRule,
+      group,
+      aclDataset.internal_accessTo,
+      "resource"
+    );
+    filteredAcl = setThing(filteredAcl, filteredRule);
+    filteredAcl = setThing(filteredAcl, remainingRule);
+  });
+
+  // Create a new Rule that only grants the given Group the given Access Modes:
+  let newRule = internal_initialiseAclRule(access);
+  newRule = setIri(newRule, acl.accessTo, aclDataset.internal_accessTo);
+  newRule = setIri(newRule, acl.agentGroup, group);
+  const updatedAcl = setThing(filteredAcl, newRule);
+
+  // Remove any remaining Rules that do not contain any meaningful statements:
+  const cleanedAcl = internal_removeEmptyAclRules(updatedAcl);
+
+  return cleanedAcl;
+}
+
+function removeGroupFromRule(
+  rule: AclRule,
+  group: WebId,
+  resourceIri: IriString,
+  ruleType: "resource" | "default"
+): [AclRule, AclRule] {
+  // If the existing Rule does not apply to the given Group, we don't need to split up.
+  // Without this check, we'd be creating a new rule for the given Group (ruleForOtherTargets)
+  // that would give it access it does not currently have:
+  if (!getIriAll(rule, acl.agentGroup).includes(group)) {
+    const emptyRule = internal_initialiseAclRule({
+      read: false,
+      append: false,
+      write: false,
+      control: false,
+    });
+    return [rule, emptyRule];
+  }
+  // The existing rule will keep applying to Groups other than the given one:
+  const ruleWithoutGroup = removeIri(rule, acl.agentGroup, group);
+  // The group already had some access in the rule, so duplicate it...
+  let ruleForOtherTargets = internal_duplicateAclRule(rule);
+  // ...but remove access to the original Resource:
+  ruleForOtherTargets = removeIri(
+    ruleForOtherTargets,
+    ruleType === "resource" ? acl.accessTo : acl.default,
+    resourceIri
+  );
+  // Only apply the new Rule to the given Group (because the existing Rule covers the others)
+  ruleForOtherTargets = setIri(ruleForOtherTargets, acl.agent, group);
+  ruleForOtherTargets = removeAll(ruleForOtherTargets, acl.agentClass);
+  ruleForOtherTargets = removeAll(ruleForOtherTargets, acl.agentGroup);
+
+  return [ruleWithoutGroup, ruleForOtherTargets];
 }

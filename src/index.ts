@@ -224,6 +224,7 @@ export {
   getGroupAccessAll,
   getGroupResourceAccess,
   getGroupResourceAccessAll,
+  setGroupResourceAccess,
   getGroupDefaultAccess,
   getGroupDefaultAccessAll,
   // Aliases for deprecated exports to preserve backwards compatibility:
