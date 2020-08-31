@@ -1,0 +1,639 @@
+
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Module: “acl/acl” &#8212; Inrupt solid-client Documentation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
+    <link href="../_static/css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/inrupt.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Module: “acl/agent”" href="_acl_agent_.html" />
+    <link rel="prev" title="@itme/solid-client" href="../README.html" />
+  
+    <meta name="robots" content="index" />
+  
+
+  <link rel="shortcut icon" href="https://docs.inrupt.com/inrupt_stickers_v2-03.png" type="image/png" />
+  <script type="text/javascript" src="https://inrupt.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e-T/-egccmf/b/24/a44af77267a987a660377e5c46e0fb64/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?locale=en-US&collectorId=41592d74"></script>
+
+  <!-- Matomo -->
+  <script type="text/javascript">
+    var _paq = window._paq || [];
+    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function() {
+      var u="https://mat.inrupt.com/";
+      _paq.push(['setTrackerUrl', u+'piwik.php']);
+      _paq.push(['setSiteId', '12']);
+      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+      g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+    })();
+  </script>
+  <!-- End Matomo Code -->
+
+  
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="docsearch:language" content="en">
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="https://inrupt.com/">
+      <img src="https://inrupt.com/sites/default/files/inrupt_email%20sign%20logo.jpg" class="logo" alt="logo">
+    </a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+          <li class="nav-item">
+             <a class="nav-link" href="https://docs.inrupt.com/ess/"> Enterprise Solid Server </a>
+          </li>
+          <li class="nav-item"><a class="nav-link" href="#">Client Libraries </a>
+               <ul class="nav-children">
+                     <li class="nav-item nav-childitem">
+                        <a href="https://docs.inrupt.com/developer-tools/javascript/client-libraries/"> JavaScript</a>
+                     </li>
+               </ul>
+          </li>
+          
+      </ul>
+
+
+      
+
+      
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar">
+
+<form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+
+
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+  <div class="bd-toc-item active">
+
+
+  
+  
+
+  
+  <ul class="nav bd-sidenav">
+     
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="../README.html">@itme/solid-client</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item active toctree-l1"> <a class="nav-link" href="">Module: “acl/acl”</a>
+             
+             
+               
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_acl_agent_.html">Module: “acl/agent”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_acl_class_.html">Module: “acl/class”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_acl_group_.html">Module: “acl/group”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_acl_mock_.html">Module: “acl/mock”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_interfaces_.html">Module: “interfaces”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_resource_mock_.html">Module: “resource/mock”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_resource_nonrdfdata_.html">Module: “resource/nonRdfData”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_resource_resource_.html">Module: “resource/resource”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_resource_soliddataset_.html">Module: “resource/solidDataset”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_thing_add_.html">Module: “thing/add”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_thing_get_.html">Module: “thing/get”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_thing_mock_.html">Module: “thing/mock”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_thing_remove_.html">Module: “thing/remove”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_thing_set_.html">Module: “thing/set”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_thing_thing_.html">Module: “thing/thing”</a>
+             
+             
+             </li> 
+           
+      
+  </ul>
+</div>
+</nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#index" class="nav-link">Index</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#functions" class="nav-link">Functions</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#id1" class="nav-link">Functions</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#createacl" class="nav-link">createAcl</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#createaclfromfallbackacl" class="nav-link">createAclFromFallbackAcl</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#deleteaclfor" class="nav-link">deleteAclFor</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#getfallbackacl" class="nav-link">getFallbackAcl</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#getresourceacl" class="nav-link">getResourceAcl</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#hasfallbackacl" class="nav-link">hasFallbackAcl</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#hasresourceacl" class="nav-link">hasResourceAcl</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#saveaclfor" class="nav-link">saveAclFor</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+      <div class="alert alert-info">
+         <span class="alert-message">All libraries and documentation are currently in Beta. Content and features are subject to change.</span>
+      </div>
+  
+              <div>
+                
+  <p><a class="reference internal" href="../README.html"><span class="doc std std-doc">&#64;itme/solid-client</span></a> › <a class="reference internal" href="#"><span class="doc std std-doc">“acl/acl”</span></a></p>
+<div class="section" id="module-acl-acl">
+<h1>Module: “acl/acl”<a class="headerlink" href="#module-acl-acl" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="index">
+<h2>Index<a class="headerlink" href="#index" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="_acl_acl_.html#createacl">createAcl</a></p></li>
+<li><p><a class="reference external" href="_acl_acl_.html#createaclfromfallbackacl">createAclFromFallbackAcl</a></p></li>
+<li><p><a class="reference external" href="_acl_acl_.html#deleteaclfor">deleteAclFor</a></p></li>
+<li><p><a class="reference external" href="_acl_acl_.html#getfallbackacl">getFallbackAcl</a></p></li>
+<li><p><a class="reference external" href="_acl_acl_.html#getresourceacl">getResourceAcl</a></p></li>
+<li><p><a class="reference external" href="_acl_acl_.html#hasfallbackacl">hasFallbackAcl</a></p></li>
+<li><p><a class="reference external" href="_acl_acl_.html#hasresourceacl">hasResourceAcl</a></p></li>
+<li><p><a class="reference external" href="_acl_acl_.html#saveaclfor">saveAclFor</a></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="id1">
+<h2>Functions<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="createacl">
+<h3>createAcl<a class="headerlink" href="#createacl" title="Permalink to this headline">¶</a></h3>
+<p>▸ <strong>createAcl</strong>(<code class="docutils literal notranslate"><span class="pre">targetResource</span></code>: <a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a> &amp; <a class="reference external" href="_interfaces_.html#withaccessibleacl">WithAccessibleAcl</a>): <em><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/190a6fd/src/acl/acl.ts#L250">acl/acl.ts:250</a></em></p>
+<p>Initialise an empty Resource ACL for a given Resource.</p>
+<p>Please note that the Web Access Control specification is not yet finalised, and hence, this
+function is still experimental and can change in a non-major release.</p>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">targetResource</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a> &amp; <a class="reference external" href="_interfaces_.html#withaccessibleacl">WithAccessibleAcl</a></p></td>
+<td><p>A Resource that does not have its own ACL yet (see <a class="reference external" href="_acl_acl_.html#hasresourceacl">hasResourceAcl</a>).</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a></em></p>
+<p>A Resource ACL for the given Resource, with no ACL Rules defined yet.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="createaclfromfallbackacl">
+<h3>createAclFromFallbackAcl<a class="headerlink" href="#createaclfromfallbackacl" title="Permalink to this headline">¶</a></h3>
+<p>▸ <strong>createAclFromFallbackAcl</strong>(<code class="docutils literal notranslate"><span class="pre">resource</span></code>: <a class="reference external" href="_interfaces_.html#withfallbackacl">WithFallbackAcl</a> &amp; <a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a> &amp; <a class="reference external" href="_interfaces_.html#withaccessibleacl">WithAccessibleAcl</a>): <em><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/190a6fd/src/acl/acl.ts#L273">acl/acl.ts:273</a></em></p>
+<p>Create a Resource ACL for a given Resource, setting the same access permissions that currently apply to it from its Container.</p>
+<p>Please note that the Web Access Control specification is not yet finalised, and hence, this
+function is still experimental and can change in a non-major release.</p>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">resource</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#withfallbackacl">WithFallbackAcl</a> &amp; <a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a> &amp; <a class="reference external" href="_interfaces_.html#withaccessibleacl">WithAccessibleAcl</a></p></td>
+<td><p>A Resource that does not have its own ACL (see <a class="reference external" href="_acl_acl_.html#hasresourceacl">hasResourceAcl</a>) and a known fallback ACL (see <a class="reference external" href="_acl_acl_.html#hasfallbackacl">hasFallbackAcl</a>).</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a></em></p>
+<p>A Resource ACL for the given Resource, with the default ACL Rules from the fallback ACL applied as Resource Rules.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="deleteaclfor">
+<h3>deleteAclFor<a class="headerlink" href="#deleteaclfor" title="Permalink to this headline">¶</a></h3>
+<p>▸ <strong>deleteAclFor</strong>‹<strong>Resource</strong>›(<code class="docutils literal notranslate"><span class="pre">resource</span></code>: Resource, <code class="docutils literal notranslate"><span class="pre">options</span></code>: Partial‹typeof internal_defaultFetchOptions›): <em>Promise‹Resource &amp; object›</em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/190a6fd/src/acl/acl.ts#L596">acl/acl.ts:596</a></em></p>
+<p>Remove the ACL of a Resource.</p>
+<p>Please note that the Web Access Control specification is not yet finalised, and hence, this
+function is still experimental and can change in a non-major release.</p>
+<p><strong>Type parameters:</strong></p>
+<p>▪ <strong>Resource</strong>: <em><a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a> &amp; <a class="reference external" href="_interfaces_.html#withaccessibleacl">WithAccessibleAcl</a></em></p>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">resource</span></code></p></td>
+<td><p>Resource</p></td>
+<td><p>-</p></td>
+<td><p>The Resource for which you want to delete the Access Control List Resource.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">options</span></code></p></td>
+<td><p>Partial‹typeof internal_defaultFetchOptions›</p></td>
+<td><p>internal_defaultFetchOptions</p></td>
+<td><p>Optional parameter <code class="docutils literal notranslate"><span class="pre">options.fetch</span></code>: An alternative <code class="docutils literal notranslate"><span class="pre">fetch</span></code> function to make the HTTP request, compatible with the browser-native <a class="reference external" href="https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters">fetch API</a>.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em>Promise‹Resource &amp; object›</em></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="getfallbackacl">
+<h3>getFallbackAcl<a class="headerlink" href="#getfallbackacl" title="Permalink to this headline">¶</a></h3>
+<p>▸ <strong>getFallbackAcl</strong>(<code class="docutils literal notranslate"><span class="pre">resource</span></code>: <a class="reference external" href="_interfaces_.html#withfallbackacl">WithFallbackAcl</a>): <em><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/190a6fd/src/acl/acl.ts#L232">acl/acl.ts:232</a></em></p>
+<p>Access the fallback ACL attached to a Resource.</p>
+<p>Given a Resource that has a fallback ACL attached, this function will give you access to that
+ACL. To verify whether the fallback ACL is available, see <a class="reference external" href="_acl_acl_.html#hasfallbackacl">hasFallbackAcl</a>.</p>
+<p>Please note that the Web Access Control specification is not yet finalised, and hence, this
+function is still experimental and can change in a non-major release.</p>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">resource</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#withfallbackacl">WithFallbackAcl</a></p></td>
+<td><p>A Resource with potentially a fallback ACL attached.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a></em></p>
+<p>The fallback ACL, or null if it coult not be accessed.</p>
+<p>▸ <strong>getFallbackAcl</strong>(<code class="docutils literal notranslate"><span class="pre">dataset</span></code>: WithAcl): <em><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a> | null</em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/190a6fd/src/acl/acl.ts#L233">acl/acl.ts:233</a></em></p>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dataset</span></code></p></td>
+<td><p>WithAcl</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a> | null</em></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="getresourceacl">
+<h3>getResourceAcl<a class="headerlink" href="#getresourceacl" title="Permalink to this headline">¶</a></h3>
+<p>▸ <strong>getResourceAcl</strong>(<code class="docutils literal notranslate"><span class="pre">resource</span></code>: WithAcl &amp; <a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a> &amp; <a class="reference external" href="_interfaces_.html#withresourceacl">WithResourceAcl</a>): <em><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/190a6fd/src/acl/acl.ts#L184">acl/acl.ts:184</a></em></p>
+<p>Access the ACL attached to a Resource.</p>
+<p>Given a Resource that has an ACL attached, this function will give you access to that ACL. To
+verify whether the ACL is available, see <a class="reference external" href="_acl_acl_.html#hasresourceacl">hasResourceAcl</a>.</p>
+<p>Please note that the Web Access Control specification is not yet finalised, and hence, this
+function is still experimental and can change in a non-major release.</p>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">resource</span></code></p></td>
+<td><p>WithAcl &amp; <a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a> &amp; <a class="reference external" href="_interfaces_.html#withresourceacl">WithResourceAcl</a></p></td>
+<td><p>A Resource with potentially an ACL attached.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a></em></p>
+<p>The ACL, if available, and undefined if not.</p>
+<p>▸ <strong>getResourceAcl</strong>(<code class="docutils literal notranslate"><span class="pre">resource</span></code>: WithAcl &amp; <a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a>): <em><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a> | null</em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/190a6fd/src/acl/acl.ts#L187">acl/acl.ts:187</a></em></p>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">resource</span></code></p></td>
+<td><p>WithAcl &amp; <a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a></p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a> | null</em></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="hasfallbackacl">
+<h3>hasFallbackAcl<a class="headerlink" href="#hasfallbackacl" title="Permalink to this headline">¶</a></h3>
+<p>▸ <strong>hasFallbackAcl</strong>‹<strong>Resource</strong>›(<code class="docutils literal notranslate"><span class="pre">resource</span></code>: Resource): <em>resource is Resource &amp; WithFallbackAcl</em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/190a6fd/src/acl/acl.ts#L214">acl/acl.ts:214</a></em></p>
+<p>Verify whether a fallback ACL was found for the given Resource.</p>
+<p>A Resource fetched with its ACL (e.g. using <a class="reference external" href="_resource_soliddataset_.html#getsoliddatasetwithacl">getSolidDatasetWithAcl</a>) <em>might</em> have a fallback ACL
+attached, but we cannot be sure: the currently authenticated user (if any) might not have Control
+access to one of the fetched Resource’s Containers.</p>
+<p>This function verifies that the fallback ACL is accessible.</p>
+<p>Please note that the Web Access Control specification is not yet finalised, and hence, this
+function is still experimental and can change in a non-major release.</p>
+<p><strong>Type parameters:</strong></p>
+<p>▪ <strong>Resource</strong>: <em>WithAcl</em></p>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">resource</span></code></p></td>
+<td><p>Resource</p></td>
+<td><p>A <a class="reference external" href="_interfaces_.html#soliddataset">SolidDataset</a> that might have a fallback ACL attached.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em>resource is Resource &amp; WithFallbackAcl</em></p>
+<p>Whether <code class="docutils literal notranslate"><span class="pre">dataset</span></code> has a fallback ACL attached.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="hasresourceacl">
+<h3>hasResourceAcl<a class="headerlink" href="#hasresourceacl" title="Permalink to this headline">¶</a></h3>
+<p>▸ <strong>hasResourceAcl</strong>‹<strong>Resource</strong>›(<code class="docutils literal notranslate"><span class="pre">resource</span></code>: Resource): <em>resource is Resource &amp; WithResourceAcl &amp; WithAccessibleAcl</em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/190a6fd/src/acl/acl.ts#L160">acl/acl.ts:160</a></em></p>
+<p>Verify whether an ACL was found for the given Resource.</p>
+<p>A Resource fetched with its ACL (e.g. using <a class="reference external" href="_resource_soliddataset_.html#getsoliddatasetwithacl">getSolidDatasetWithAcl</a>) <em>might</em> have a resource ACL attached, but
+we cannot be sure: it might be that none exists for this specific Resource (in which case the
+fallback ACL applies), or the currently authenticated user (if any) might not have Control access
+to the fetched Resource.</p>
+<p>This function verifies that the Resource’s ACL is accessible.</p>
+<p>Please note that the Web Access Control specification is not yet finalised, and hence, this
+function is still experimental and can change in a non-major release.</p>
+<p><strong>Type parameters:</strong></p>
+<p>▪ <strong>Resource</strong>: <em>WithAcl &amp; <a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a></em></p>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">resource</span></code></p></td>
+<td><p>Resource</p></td>
+<td><p>A Resource that might have an ACL attached.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em>resource is Resource &amp; WithResourceAcl &amp; WithAccessibleAcl</em></p>
+<p>Whether <code class="docutils literal notranslate"><span class="pre">dataset</span></code> has an ACL attached.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="saveaclfor">
+<h3>saveAclFor<a class="headerlink" href="#saveaclfor" title="Permalink to this headline">¶</a></h3>
+<p>▸ <strong>saveAclFor</strong>(<code class="docutils literal notranslate"><span class="pre">resource</span></code>: <a class="reference external" href="_interfaces_.html#withaccessibleacl">WithAccessibleAcl</a>, <code class="docutils literal notranslate"><span class="pre">resourceAcl</span></code>: <a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a>, <code class="docutils literal notranslate"><span class="pre">options</span></code>: Partial‹typeof internal_defaultFetchOptions›): <em>Promise‹<a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a> &amp; <a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a>›</em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/190a6fd/src/acl/acl.ts#L565">acl/acl.ts:565</a></em></p>
+<p>Save the ACL for a Resource.</p>
+<p>Please note that the Web Access Control specification is not yet finalised, and hence, this
+function is still experimental and can change in a non-major release.</p>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">resource</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#withaccessibleacl">WithAccessibleAcl</a></p></td>
+<td><p>-</p></td>
+<td><p>The Resource to which the given ACL applies.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">resourceAcl</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a></p></td>
+<td><p>-</p></td>
+<td><p>An <a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a> whose ACL Rules will apply to <code class="docutils literal notranslate"><span class="pre">resource</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">options</span></code></p></td>
+<td><p>Partial‹typeof internal_defaultFetchOptions›</p></td>
+<td><p>internal_defaultFetchOptions</p></td>
+<td><p>Optional parameter <code class="docutils literal notranslate"><span class="pre">options.fetch</span></code>: An alternative <code class="docutils literal notranslate"><span class="pre">fetch</span></code> function to make the HTTP request, compatible with the browser-native <a class="reference external" href="https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters">fetch API</a>.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em>Promise‹<a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a> &amp; <a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a>›</em></p>
+</div>
+</div>
+</div>
+
+
+              </div>
+              
+
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="../README.html" title="previous page">&#64;itme/solid-client</a>
+    <a class='right-next' id="next-link" href="_acl_agent_.html" title="next page">Module: “acl/agent”</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    <script src="../_static/js/index.js"></script>
+    <footer class="footer">
+  <div class="container">
+    <p>
+          &copy; Copyright 2020-present, Inrupt Inc.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

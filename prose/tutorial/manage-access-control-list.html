@@ -1,0 +1,580 @@
+
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Access to Data (ACL) &#8212; Inrupt solid-client Documentation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
+    <link href="../_static/css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" href="../_static/css/inrupt.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Reference" href="../reference.html" />
+    <link rel="prev" title="Read/Write Files" href="read-write-files.html" />
+  
+    <meta name="robots" content="index" />
+  
+
+  <link rel="shortcut icon" href="https://docs.inrupt.com/inrupt_stickers_v2-03.png" type="image/png" />
+  <script type="text/javascript" src="https://inrupt.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e-T/-egccmf/b/24/a44af77267a987a660377e5c46e0fb64/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?locale=en-US&collectorId=41592d74"></script>
+
+  <!-- Matomo -->
+  <script type="text/javascript">
+    var _paq = window._paq || [];
+    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function() {
+      var u="https://mat.inrupt.com/";
+      _paq.push(['setTrackerUrl', u+'piwik.php']);
+      _paq.push(['setSiteId', '12']);
+      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+      g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+    })();
+  </script>
+  <!-- End Matomo Code -->
+
+  
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="docsearch:language" content="en">
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="https://inrupt.com/">
+      <img src="https://inrupt.com/sites/default/files/inrupt_email%20sign%20logo.jpg" class="logo" alt="logo">
+    </a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+          <li class="nav-item">
+             <a class="nav-link" href="https://docs.inrupt.com/ess/"> Enterprise Solid Server </a>
+          </li>
+          <li class="nav-item"><a class="nav-link" href="#">Client Libraries </a>
+               <ul class="nav-children">
+                     <li class="nav-item nav-childitem">
+                        <a href="https://docs.inrupt.com/developer-tools/javascript/client-libraries/"> JavaScript</a>
+                     </li>
+               </ul>
+          </li>
+          
+      </ul>
+
+
+      
+
+      
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar">
+
+<form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+
+
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+  <div class="bd-toc-item active">
+
+
+  
+  
+
+  
+  <ul class="nav bd-sidenav">
+     
+     <li class="nav-item toctree-top">
+        <a class="nav-link" href="../"> Inrupt solid-client Documentation </a>
+     </li>
+     
+     
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="../installation.html">Installation</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="read-write-data.html">Read/Write Data</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="read-write-files.html">Read/Write Files</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item active toctree-l1"> <a class="nav-link" href="">Manage Access to Data (ACL)</a>
+             
+             
+               
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="../reference.html">Reference</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="../api.html">API Reference</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="https://github.com/inrupt/solid-client-js">Source on GitHub</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="../issues-help.html">Issues & Help</a>
+             
+             
+             </li> 
+           
+      
+  </ul>
+</div>
+</nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#access-control-list" class="nav-link">Access Control List</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#read-access-information-for-a-resource" class="nav-link">Read Access Information for a Resource</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#read-public-access" class="nav-link">Read Public Access</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#reading-agent-access" class="nav-link">Reading Agent Access</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#change-access-to-a-resource" class="nav-link">Change Access to a Resource</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#set-public-access" class="nav-link">Set Public Access</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#set-agent-access" class="nav-link">Set Agent Access</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+    </ul>
+</nav>
+
+
+	
+	   <div class="tocsection editthispage">
+	       <i class="fas fa-edit"></i> 
+	       <a class="edit-link" href="https://github.com/inrupt/solid-client-js/blob/master/docs/prose/source/tutorial/manage-access-control-list.rst" target="_blank" title="Edit tutorial/manage-access-control-list.txt on GitHub">
+	           <span>Edit on Github</span>
+	       </a>
+	   </div>
+	
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+  
+  <div class="related">
+    
+  </div>
+      <div class="alert alert-info">
+         <span class="alert-message">All libraries and documentation are currently in Beta. Content and features are subject to change.</span>
+      </div>
+  
+              <div>
+                
+  <div class="section" id="manage-access-to-data-acl">
+<h1>Manage Access to Data (ACL)<a class="headerlink" href="#manage-access-to-data-acl" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="access-control-list">
+<h2>Access Control List<a class="headerlink" href="#access-control-list" title="Permalink to this headline">¶</a></h2>
+<p>A <a class="reference internal" href="../reference/glossary.html#term-Resource"><span class="xref std std-term">Resource</span></a>’s Access Control Lists (ACLs) determine the access
+to that Resource. An ACL entry can specify following <a class="reference internal" href="../reference/glossary.html#term-Access-Modes"><span class="xref std std-term">Access
+Modes</span></a> :</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../reference/glossary.html#term-Read-Access"><span class="xref std std-term">Read Access</span></a>,</p></li>
+<li><p><a class="reference internal" href="../reference/glossary.html#term-Append-Access"><span class="xref std std-term">Append Access</span></a>,</p></li>
+<li><p><a class="reference internal" href="../reference/glossary.html#term-Write-Access"><span class="xref std std-term">Write Access</span></a>, and</p></li>
+<li><p><a class="reference internal" href="../reference/glossary.html#term-Control-Access"><span class="xref std std-term">Control Access</span></a>.</p></li>
+</ul>
+<p>Access (i.e. an ACL entry) can be granted to individual <a class="reference internal" href="../reference/glossary.html#term-Agent"><span class="xref std std-term">agents</span></a>, to groups, or even to everyone.</p>
+<p>For a Resource, you can define:</p>
+<ul class="simple">
+<li><p>a Resource-specific ACL that applies only to that Resource, and</p></li>
+<li><p>an inheritable ACL that applies to the Resource’s children as a
+default/fallback ACL if they don’t specify their own
+Resource-specific ACL.</p></li>
+</ul>
+<p>That is, if a Resource has a Resource-specific ACL, that ACL applies to
+that Resource and only to that Resource. However, if the
+Resource-specific ACL does not exist, the Resource’s
+<a class="reference internal" href="../reference/glossary.html#term-Container"><span class="xref std std-term">Container</span></a>’s inheritable ACL (or if that is unset, then that of
+its Container’s Container, etc.) acts as the Resource’s fallback ACL.
+As such, the ACL for a Resource may be defined in separate Resource,
+and retrieving a Resource with its ACL may result in extra HTTP
+requests being sent.</p>
+<div class="topic">
+<p class="topic-title">Trusted Applications</p>
+<p>An application can access a Resource’s or Container’s ACL only if the
+Authenticated User has <a class="reference internal" href="../reference/glossary.html#term-Control-Access"><span class="xref std std-term">Control Access</span></a> to
+the applicable Resource or Container, and has authorized the application
+to manage access on their behalf.</p>
+</div>
+</div>
+<div class="section" id="read-access-information-for-a-resource">
+<h2>Read Access Information for a Resource<a class="headerlink" href="#read-access-information-for-a-resource" title="Permalink to this headline">¶</a></h2>
+<p>To retrieve the ACL for a resource in addition to the Resource itself,
+use the <a class="reference external" href="https://docs.inrupt.com/client-libraries/api/javascript/solid-client/modules/_resource_soliddataset_.html#getsoliddatasetwithacl">getSolidDatasetWithAcl</a> function.
+The returned value includes the Resource data, the <code class="docutils literal notranslate"><span class="pre">ResourceInfo</span></code>
+(i.e., metadata), and the ACL.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <a class="reference external" href="https://docs.inrupt.com/client-libraries/api/javascript/solid-client/modules/_resource_soliddataset_.html#getsoliddatasetwithacl">getSolidDatasetWithAcl</a> function
+may result in many extra HTTP requests being sent.</p>
+</div>
+<div class="section" id="read-public-access">
+<h3>Read Public Access<a class="headerlink" href="#read-public-access" title="Permalink to this headline">¶</a></h3>
+<p>From a <a class="reference internal" href="../reference/glossary.html#term-SolidDataset"><span class="xref std std-term">SolidDataset</span></a> that has an ACL attached, you can use
+<a class="reference external" href="https://docs.inrupt.com/client-libraries/api/javascript/solid-client/modules/_acl_class_.html#getpublicaccess">getPublicAccess</a> to retrieve the access granted
+to the public in general, regardless of whether they are authenticated
+or not.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="p">{</span>
+  <span class="nx">getSolidDatasetWithAcl</span><span class="p">,</span>
+  <span class="nx">getPublicAccess</span><span class="p">,</span>
+<span class="p">}</span> <span class="nx">from</span> <span class="s2">&quot;@inrupt/solid-client&quot;</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">myDatasetWithAcl</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">getSolidDatasetWithAcl</span><span class="p">(</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">publicAccess</span> <span class="o">=</span> <span class="nx">getPublicAccess</span><span class="p">(</span><span class="nx">myDatasetWithAcl</span><span class="p">);</span>
+
+<span class="c1">// =&gt; an object like</span>
+<span class="c1">//    { read: true, append: false, write: false, control: true }</span>
+<span class="c1">//    or null if the ACL is not accessible to the current user.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="reading-agent-access">
+<h3>Reading Agent Access<a class="headerlink" href="#reading-agent-access" title="Permalink to this headline">¶</a></h3>
+<p>From a <a class="reference internal" href="../reference/glossary.html#term-SolidDataset"><span class="xref std std-term">SolidDataset</span></a> that has an ACL attached, you can use:</p>
+<ul>
+<li><p><a class="reference external" href="https://docs.inrupt.com/client-libraries/api/javascript/solid-client/modules/_acl_agent_.html#getagentaccess">getAgentAccess</a> to retrieve the access
+granted to a specific agent:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="p">{</span>
+  <span class="nx">getSolidDatasetWithAcl</span><span class="p">,</span>
+  <span class="nx">getAgentAccess</span><span class="p">,</span>
+<span class="p">}</span> <span class="nx">from</span> <span class="s2">&quot;@inrupt/solid-client&quot;</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">webId</span> <span class="o">=</span> <span class="s2">&quot;https://example.com/profile#webid&quot;</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">myDatasetWithAcl</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">getSolidDatasetWithAcl</span><span class="p">(</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">agentAccess</span> <span class="o">=</span> <span class="nx">getAgentAccess</span><span class="p">(</span><span class="nx">myDatasetWithAcl</span><span class="p">,</span> <span class="nx">webId</span><span class="p">);</span>
+
+<span class="c1">// =&gt; an object like</span>
+<span class="c1">//    { read: true, append: false, write: false, control: true }</span>
+<span class="c1">//    or null if the ACL is not accessible to the current user.</span>
+</pre></div>
+</div>
+</li>
+<li><p><a class="reference external" href="https://docs.inrupt.com/client-libraries/api/javascript/solid-client/modules/_acl_agent_.html#getagentaccessall">getAgentAccessAll</a> to retrieve access
+information for all agents that have access:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="p">{</span>
+  <span class="nx">getSolidDatasetWithAcl</span><span class="p">,</span>
+  <span class="nx">getAgentAccessAll</span><span class="p">,</span>
+<span class="p">}</span> <span class="nx">from</span> <span class="s2">&quot;@inrupt/solid-client&quot;</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">myDatasetWithAcl</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">getSolidDatasetWithAcl</span><span class="p">(</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">accessByAgent</span> <span class="o">=</span> <span class="nx">getAgentAccessAll</span><span class="p">(</span><span class="nx">myDatasetWithAcl</span><span class="p">);</span>
+
+<span class="c1">// =&gt; an object like</span>
+<span class="c1">//    {</span>
+<span class="c1">//      &quot;https://example.com/profile#webid&quot;:</span>
+<span class="c1">//        { read: true, append: false, write: false, control: true },</span>
+<span class="c1">//      &quot;https://example.com/other-profile#webid&quot;:</span>
+<span class="c1">//        { read: true, append: false, write: false, control: false },</span>
+<span class="c1">//    }</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="change-access-to-a-resource">
+<span id="manage-acl-change-access-to-resource"></span><h2>Change Access to a Resource<a class="headerlink" href="#change-access-to-a-resource" title="Permalink to this headline">¶</a></h2>
+<p>The following outlines the steps for modifying a Resource-specific ACL.
+If the Resource does not currently does not have a Resource-specific
+ACL (i.e., the Resource uses its fallback ACL inherited from its
+Container), the outline includes creating a Resource-specific ACL,
+overriding the fallback ACL.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>You must have <a class="reference internal" href="../reference/glossary.html#term-Control-Access"><span class="xref std std-term">Control Access</span></a> on the Resource to modify its
+ACL.</p>
+</div>
+<p>To modify access to a Resource:</p>
+<ol class="arabic simple">
+<li><p>Use <a class="reference external" href="https://docs.inrupt.com/client-libraries/api/javascript/solid-client/modules/_resource_soliddataset_.html#getsoliddatasetwithacl">getSolidDatasetWithAcl</a> to
+retrieve the Resource and its ACL.</p></li>
+<li><p>From the retrieved Resource, call <a class="reference external" href="https://docs.inrupt.com/client-libraries/api/javascript/solid-client/modules/_acl_acl_.html#getresourceacl">getResourceACL</a> to obtain its Resource-specific
+ACL. The function returns <code class="docutils literal notranslate"><span class="pre">null</span></code> if the Resource-specific ACL does
+not exists.</p></li>
+<li><p>If the Resource-specific ACL exists,</p>
+<ol class="loweralpha simple">
+<li><p>You can create a modified ACL from the existing Resource-specific
+ACL.</p></li>
+<li><p>Ensure that the modified ACL includes at least one entry with
+<a class="reference internal" href="../reference/glossary.html#term-Control-Access"><span class="xref std std-term">Control Access</span></a>.</p></li>
+<li><p>Save the modified ACL to the Pod.</p></li>
+</ol>
+</li>
+<li><p>Otherwise, you can create a new Resource-specific ACL and save. Once
+you save the new Resource-specific ACL, this ACL overrides the
+inherited fallback ACL.</p>
+<ol class="loweralpha simple">
+<li><p>To create a new ACL, you can use <a class="reference external" href="https://docs.inrupt.com/client-libraries/api/javascript/solid-client/modules/_acl_acl_.html#createacl">createAcl</a> to create a new empty ACL.</p></li>
+<li><p>If you have access to the Resource’s fallback ACL, you can
+copy the currently applicable rules to a newly-initialised ACL.</p></li>
+<li><p>Ensure that the modified ACL includes at least one entry with
+<a class="reference internal" href="../reference/glossary.html#term-Control-Access"><span class="xref std std-term">Control Access</span></a>.</p></li>
+<li><p>Save the modified ACL to the Pod.</p></li>
+</ol>
+</li>
+</ol>
+<p>The general process of changing access to a Resource is as follows:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="p">{</span>
+  <span class="nx">getSolidDatasetWithAcl</span><span class="p">,</span>
+  <span class="nx">hasResourceAcl</span><span class="p">,</span>
+  <span class="nx">hasFallbackAcl</span><span class="p">,</span>
+  <span class="nx">hasAccessibleAcl</span><span class="p">,</span>
+  <span class="nx">createAcl</span><span class="p">,</span>
+  <span class="nx">createAclFromFallbackAcl</span><span class="p">,</span>
+  <span class="nx">getResourceAcl</span><span class="p">,</span>
+  <span class="nx">setAgentResourceAccess</span><span class="p">,</span>
+  <span class="nx">saveAclFor</span><span class="p">,</span>
+<span class="p">}</span> <span class="nx">from</span> <span class="s2">&quot;@inrupt/solid-client&quot;</span><span class="p">;</span>
+
+<span class="c1">// Fetch the SolidDataset and its associated ACLs, if available:</span>
+<span class="kr">const</span> <span class="nx">myDatasetWithAcl</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">getSolidDatasetWithAcl</span><span class="p">(</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">);</span>
+
+<span class="c1">// Obtain the SolidDataset&#39;s own ACL, if available,</span>
+<span class="c1">// or initialise a new one, if possible:</span>
+<span class="kd">let</span> <span class="nx">resourceAcl</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">hasResourceAcl</span><span class="p">(</span><span class="nx">myDatasetWithAcl</span><span class="p">))</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">hasAccessibleAcl</span><span class="p">(</span><span class="nx">myDatasetWithAcl</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span>
+      <span class="s2">&quot;The current user does not have permission to change access rights to this Resource.&quot;</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">hasFallbackAcl</span><span class="p">(</span><span class="nx">myDatasetWithAcl</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span>
+      <span class="s2">&quot;The current user does not have permission to see who currently has access to this Resource.&quot;</span>
+    <span class="p">);</span>
+    <span class="c1">// Alternatively, initialise a new empty ACL as follows,</span>
+    <span class="c1">// but be aware that if you do not give someone Control access,</span>
+    <span class="c1">// **nobody will ever be able to change Access permissions in the future**:</span>
+    <span class="c1">// resourceAcl = createAcl(myDatasetWithAcl);</span>
+  <span class="p">}</span>
+  <span class="nx">resourceAcl</span> <span class="o">=</span> <span class="nx">createAclFromFallbackAcl</span><span class="p">(</span><span class="nx">myDatasetWithAcl</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+  <span class="nx">resourceAcl</span> <span class="o">=</span> <span class="nx">getResourceAcl</span><span class="p">(</span><span class="nx">myDatasetWithAcl</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Give someone Control access to the given Resource:</span>
+<span class="kr">const</span> <span class="nx">updatedAcl</span> <span class="o">=</span> <span class="nx">setAgentResourceAccess</span><span class="p">(</span>
+  <span class="nx">resourceAcl</span><span class="p">,</span>
+  <span class="s2">&quot;https://some.pod/profile#webId&quot;</span><span class="p">,</span>
+  <span class="p">{</span> <span class="nx">read</span>: <span class="kt">false</span><span class="p">,</span> <span class="nx">append</span>: <span class="kt">false</span><span class="p">,</span> <span class="nx">write</span>: <span class="kt">false</span><span class="p">,</span> <span class="nx">control</span>: <span class="kt">true</span> <span class="p">}</span>
+<span class="p">);</span>
+
+<span class="c1">// Now save the ACL:</span>
+<span class="nx">await</span> <span class="nx">saveAclFor</span><span class="p">(</span><span class="nx">myDatasetWithAcl</span><span class="p">,</span> <span class="nx">updatedAcl</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="section" id="set-public-access">
+<h3>Set Public Access<a class="headerlink" href="#set-public-access" title="Permalink to this headline">¶</a></h3>
+<p>Given a Resource’s ACL obtained as specified in
+<a class="reference internal" href="#manage-acl-change-access-to-resource"><span class="std std-ref">Change Access to a Resource</span></a>, you can:</p>
+<ul>
+<li><p>Use <a class="reference external" href="https://docs.inrupt.com/client-libraries/api/javascript/solid-client/modules/_acl_class_.html#setpublicresourceaccess">setPublicResourceAccess</a> to grant Access Modes
+to everybody (whether logged in or not) for the Resource itself:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="p">{</span>
+  <span class="nx">setPublicResourceAccess</span><span class="p">,</span>
+<span class="p">}</span> <span class="nx">from</span> <span class="s2">&quot;@inrupt/solid-client&quot;</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">resourceAcl</span> <span class="o">=</span> <span class="cm">/* Obtained previously in the section &quot;Change Access to a Resource&quot; */</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">updatedAcl</span> <span class="o">=</span> <span class="nx">setPublicResourceAccess</span><span class="p">(</span>
+  <span class="nx">resourceAcl</span><span class="p">,</span>
+  <span class="p">{</span> <span class="nx">read</span>: <span class="kt">true</span><span class="p">,</span> <span class="nx">append</span>: <span class="kt">true</span><span class="p">,</span> <span class="nx">write</span>: <span class="kt">false</span><span class="p">,</span> <span class="nx">control</span>: <span class="kt">false</span> <span class="p">},</span>
+<span class="p">);</span>
+
+<span class="c1">// `updatedAcl` can now be saved back to the Pod</span>
+<span class="c1">// using `saveAclFor()`.</span>
+</pre></div>
+</div>
+</li>
+<li><p>Use <a class="reference external" href="https://docs.inrupt.com/client-libraries/api/javascript/solid-client/modules/_acl_agent_.html#setpublicdefaultaccess">setPublicDefaultAccess</a> to grant Access Modes
+to everybody (whether logged in or not) for the Resource’s children
+if the Resource is a Container:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="p">{</span>
+  <span class="nx">setPublicDefaultAccess</span><span class="p">,</span>
+<span class="p">}</span> <span class="nx">from</span> <span class="s2">&quot;@inrupt/solid-client&quot;</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">resourceAcl</span> <span class="o">=</span> <span class="cm">/* Obtained previously in the section &quot;Change Access to a Resource&quot; */</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">updatedAcl</span> <span class="o">=</span> <span class="nx">setPublicDefaultAccess</span><span class="p">(</span>
+  <span class="nx">resourceAcl</span><span class="p">,</span>
+  <span class="p">{</span> <span class="nx">read</span>: <span class="kt">true</span><span class="p">,</span> <span class="nx">append</span>: <span class="kt">true</span><span class="p">,</span> <span class="nx">write</span>: <span class="kt">false</span><span class="p">,</span> <span class="nx">control</span>: <span class="kt">false</span> <span class="p">},</span>
+<span class="p">);</span>
+
+<span class="c1">// `updatedAcl` can now be saved back to the Pod</span>
+<span class="c1">// using `saveAclFor()`.</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="set-agent-access">
+<h3>Set Agent Access<a class="headerlink" href="#set-agent-access" title="Permalink to this headline">¶</a></h3>
+<p>Given a Resource’s ACL obtained as specified in
+<a class="reference internal" href="#manage-acl-change-access-to-resource"><span class="std std-ref">Change Access to a Resource</span></a>, you can:</p>
+<ul>
+<li><p>Use <a class="reference external" href="https://docs.inrupt.com/client-libraries/api/javascript/solid-client/modules/_acl_agent_.html#setagentresourceaccess">setAgentResourceAccess</a> to grant Access Modes
+to an Agent for the Resource itself:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="p">{</span>
+  <span class="nx">setAgentResourceAccess</span><span class="p">,</span>
+<span class="p">}</span> <span class="nx">from</span> <span class="s2">&quot;@inrupt/solid-client&quot;</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">resourceAcl</span> <span class="o">=</span> <span class="cm">/* Obtained previously in the section &quot;Change Access to a Resource&quot; */</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">webId</span> <span class="o">=</span> <span class="s2">&quot;https://example.com/profile#webid&quot;</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">updatedAcl</span> <span class="o">=</span> <span class="nx">setAgentResourceAccess</span><span class="p">(</span>
+  <span class="nx">resourceAcl</span><span class="p">,</span>
+  <span class="nx">webId</span><span class="p">,</span>
+  <span class="p">{</span> <span class="nx">read</span>: <span class="kt">true</span><span class="p">,</span> <span class="nx">append</span>: <span class="kt">true</span><span class="p">,</span> <span class="nx">write</span>: <span class="kt">false</span><span class="p">,</span> <span class="nx">control</span>: <span class="kt">false</span> <span class="p">},</span>
+<span class="p">);</span>
+
+<span class="c1">// `updatedAcl` can now be saved back to the Pod</span>
+<span class="c1">// using `saveAclFor()`.</span>
+</pre></div>
+</div>
+</li>
+<li><p>Use <a class="reference external" href="https://docs.inrupt.com/client-libraries/api/javascript/solid-client/modules/_acl_agent_.html#setagentdefaultaccess">setAgentDefaultAccess</a> to grant Access Modes
+to an Agent for the Resource’s children if the Resource is a
+Container:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="p">{</span>
+  <span class="nx">setAgentDefaultAccess</span><span class="p">,</span>
+<span class="p">}</span> <span class="nx">from</span> <span class="s2">&quot;@inrupt/solid-client&quot;</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">resourceAcl</span> <span class="o">=</span> <span class="cm">/* Obtained previously in the section &quot;Change Access to a Resource&quot; */</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">webId</span> <span class="o">=</span> <span class="s2">&quot;https://example.com/profile#webid&quot;</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">updatedAcl</span> <span class="o">=</span> <span class="nx">setAgentDefaultAccess</span><span class="p">(</span>
+  <span class="nx">resourceAcl</span><span class="p">,</span>
+  <span class="nx">webId</span><span class="p">,</span>
+  <span class="p">{</span> <span class="nx">read</span>: <span class="kt">true</span><span class="p">,</span> <span class="nx">append</span>: <span class="kt">true</span><span class="p">,</span> <span class="nx">write</span>: <span class="kt">false</span><span class="p">,</span> <span class="nx">control</span>: <span class="kt">false</span> <span class="p">},</span>
+<span class="p">);</span>
+
+<span class="c1">// `updatedAcl` can now be saved back to the Pod</span>
+<span class="c1">// using `saveAclFor()`.</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+              </div>
+              
+
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="read-write-files.html" title="previous page">Read/Write Files</a>
+    <a class='right-next' id="next-link" href="../reference.html" title="next page">Reference</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    <script src="../_static/js/index.js"></script>
+    <footer class="footer">
+  <div class="container">
+    <p>
+          &copy; Copyright 2020-present, Inrupt Inc.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
