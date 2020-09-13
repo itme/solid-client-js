@@ -425,7 +425,7 @@
 <div class="section" id="access">
 <h3>Access<a class="headerlink" href="#access" title="Permalink to this headline">¶</a></h3>
 <p>Ƭ <strong>Access</strong>: <em>object</em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L89">interfaces.ts:89</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L89">interfaces.ts:89</a></em></p>
 <p>An object with the boolean properties <code class="docutils literal notranslate"><span class="pre">read</span></code>, <code class="docutils literal notranslate"><span class="pre">append</span></code>, <code class="docutils literal notranslate"><span class="pre">write</span></code> and <code class="docutils literal notranslate"><span class="pre">control</span></code>, representing the
 respective Access Modes defined by the Web Access Control specification.</p>
 <p>Since that specification is not finalised yet, this interface is still experimental.</p>
@@ -443,7 +443,7 @@ respective Access Modes defined by the Web Access Control specification.</p>
 <div class="section" id="acldataset">
 <h3>AclDataset<a class="headerlink" href="#acldataset" title="Permalink to this headline">¶</a></h3>
 <p>Ƭ <strong>AclDataset</strong>: <em><a class="reference external" href="_interfaces_.html#soliddataset">SolidDataset</a> &amp; <a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a> &amp; object</em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L75">interfaces.ts:75</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L75">interfaces.ts:75</a></em></p>
 <p>A <a class="reference external" href="_interfaces_.html#soliddataset">SolidDataset</a> containing Access Control rules for another SolidDataset.</p>
 <p>Please note that the Web Access Control specification is not yet finalised, and hence, this
 function is still experimental and can change in a non-major release.</p>
@@ -452,14 +452,14 @@ function is still experimental and can change in a non-major release.</p>
 <div class="section" id="soliddataset">
 <h3>SolidDataset<a class="headerlink" href="#soliddataset" title="Permalink to this headline">¶</a></h3>
 <p>Ƭ <strong>SolidDataset</strong>: <em>DatasetCore</em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L44">interfaces.ts:44</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L44">interfaces.ts:44</a></em></p>
 <p>A SolidDataset represents all Quads from a single Resource.</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="thing">
 <h3>Thing<a class="headerlink" href="#thing" title="Permalink to this headline">¶</a></h3>
 <p>Ƭ <strong>Thing</strong>: <em>DatasetCore &amp; object | object</em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L49">interfaces.ts:49</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L49">interfaces.ts:49</a></em></p>
 <p>A Thing represents all Quads with a given Subject URL and a given Named
 Graph, from a single Resource.</p>
 </div>
@@ -467,21 +467,21 @@ Graph, from a single Resource.</p>
 <div class="section" id="thinglocal">
 <h3>ThingLocal<a class="headerlink" href="#thinglocal" title="Permalink to this headline">¶</a></h3>
 <p>Ƭ <strong>ThingLocal</strong>: <em><a class="reference external" href="_interfaces_.html#thing">Thing</a> &amp; object</em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L58">interfaces.ts:58</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L58">interfaces.ts:58</a></em></p>
 <p>A <a class="reference external" href="_interfaces_.html#thing">Thing</a> whose full Subject URL will be determined when it is persisted.</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="thingpersisted">
 <h3>ThingPersisted<a class="headerlink" href="#thingpersisted" title="Permalink to this headline">¶</a></h3>
 <p>Ƭ <strong>ThingPersisted</strong>: <em><a class="reference external" href="_interfaces_.html#thing">Thing</a> &amp; object</em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L54">interfaces.ts:54</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L54">interfaces.ts:54</a></em></p>
 <p>A <a class="reference external" href="_interfaces_.html#thing">Thing</a> for which we know what the full Subject URL is.</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="uploadrequestinit">
 <h3>UploadRequestInit<a class="headerlink" href="#uploadrequestinit" title="Permalink to this headline">¶</a></h3>
 <p>Ƭ <strong>UploadRequestInit</strong>: <em>Omit‹RequestInit, “method”›</em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L267">interfaces.ts:267</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L267">interfaces.ts:267</a></em></p>
 <p>A RequestInit restriction where the method is set by the library</p>
 <p>Please note that this function is still experimental and can change in a non-major release.</p>
 </div>
@@ -489,28 +489,28 @@ Graph, from a single Resource.</p>
 <div class="section" id="url">
 <h3>Url<a class="headerlink" href="#url" title="Permalink to this headline">¶</a></h3>
 <p>Ƭ <strong>Url</strong>: <em>NamedNode</em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L27">interfaces.ts:27</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L27">interfaces.ts:27</a></em></p>
 <p>Alias to indicate where we expect to be given a URL represented as an RDF/JS NamedNode.</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="urlstring">
 <h3>UrlString<a class="headerlink" href="#urlstring" title="Permalink to this headline">¶</a></h3>
 <p>Ƭ <strong>UrlString</strong>: <em>string</em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L33">interfaces.ts:33</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L33">interfaces.ts:33</a></em></p>
 <p>Alias to indicate where we expect to be given a URL.</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="webid">
 <h3>WebId<a class="headerlink" href="#webid" title="Permalink to this headline">¶</a></h3>
 <p>Ƭ <strong>WebId</strong>: <em><a class="reference external" href="_interfaces_.html#urlstring">UrlString</a></em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L39">interfaces.ts:39</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L39">interfaces.ts:39</a></em></p>
 <p>Alias to indicate where we expect to be given a WebId.</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="withaccessibleacl">
 <h3>WithAccessibleAcl<a class="headerlink" href="#withaccessibleacl" title="Permalink to this headline">¶</a></h3>
 <p>Ƭ <strong>WithAccessibleAcl</strong>: <em>Resource &amp; object</em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L233">interfaces.ts:233</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L233">interfaces.ts:233</a></em></p>
 <p>If this type applies to a Resource, its Access Control List, if it exists, is accessible to the currently authenticated user.</p>
 <p>Please note that the Web Access Control specification is not yet finalised, and hence, this
 function is still experimental and can change in a non-major release.</p>
@@ -519,7 +519,7 @@ function is still experimental and can change in a non-major release.</p>
 <div class="section" id="withfallbackacl">
 <h3>WithFallbackAcl<a class="headerlink" href="#withfallbackacl" title="Permalink to this headline">¶</a></h3>
 <p>Ƭ <strong>WithFallbackAcl</strong>: <em>Resource &amp; object</em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L176">interfaces.ts:176</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L176">interfaces.ts:176</a></em></p>
 <p>If this type applies to a Resource, the Access Control List that applies to its nearest Container with an ACL is accessible to the currently authenticated user.</p>
 <p>Please note that the Web Access Control specification is not yet finalised, and hence, this
 function is still experimental and can change in a non-major release.</p>
@@ -528,7 +528,7 @@ function is still experimental and can change in a non-major release.</p>
 <div class="section" id="withresourceacl">
 <h3>WithResourceAcl<a class="headerlink" href="#withresourceacl" title="Permalink to this headline">¶</a></h3>
 <p>Ƭ <strong>WithResourceAcl</strong>: <em>Resource &amp; object</em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L164">interfaces.ts:164</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L164">interfaces.ts:164</a></em></p>
 <p>If this type applies to a Resource, an Access Control List that applies to it exists and is accessible to the currently authenticated user.</p>
 <p>Please note that the Web Access Control specification is not yet finalised, and hence, this
 function is still experimental and can change in a non-major release.</p>
@@ -537,7 +537,7 @@ function is still experimental and can change in a non-major release.</p>
 <div class="section" id="withresourceinfo">
 <h3>WithResourceInfo<a class="headerlink" href="#withresourceinfo" title="Permalink to this headline">¶</a></h3>
 <p>Ƭ <strong>WithResourceInfo</strong>: <em>object</em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L109">interfaces.ts:109</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L109">interfaces.ts:109</a></em></p>
 <p><a class="reference external" href="_interfaces_.html#soliddataset">SolidDataset</a>s fetched by solid-client include this metadata describing its relation to a Pod Resource.</p>
 <p><strong>Do not read these properties directly</strong>; their internal representation may change at any time.
 Instead, use functions such as <a class="reference external" href="_resource_resource_.html#getsourceurl">getSourceUrl</a>, <a class="reference external" href="_resource_resource_.html#israwdata">isRawData</a> and <a class="reference external" href="_resource_resource_.html#getcontenttype">getContentType</a>.</p>
@@ -550,8 +550,8 @@ Instead, use functions such as <a class="reference external" href="_resource_res
 <h2>Functions<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="hasaccessibleacl">
 <h3>hasAccessibleAcl<a class="headerlink" href="#hasaccessibleacl" title="Permalink to this headline">¶</a></h3>
-<p>▸ <strong>hasAccessibleAcl</strong>‹<strong>Resource</strong>›(<code class="docutils literal notranslate"><span class="pre">dataset</span></code>: Resource): <em>dataset is WithAccessibleAcl<Resource></em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L256">interfaces.ts:256</a></em></p>
+<p>▸ <strong>hasAccessibleAcl</strong>‹<strong>Resource</strong>›(<code class="docutils literal notranslate"><span class="pre">dataset</span></code>: Resource): <em>dataset is WithAccessibleAcl‹Resource›</em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L256">interfaces.ts:256</a></em></p>
 <p>Given a <a class="reference external" href="_interfaces_.html#soliddataset">SolidDataset</a>, verify whether its Access Control List is accessible to the current user.</p>
 <p>This should generally only be true for SolidDatasets fetched by
 <a class="reference external" href="_resource_soliddataset_.html#getsoliddatasetwithacl">getSolidDatasetWithAcl</a>.</p>
@@ -574,14 +574,14 @@ function is still experimental and can change in a non-major release.</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Returns:</strong> <em>dataset is WithAccessibleAcl<Resource></em></p>
+<p><strong>Returns:</strong> <em>dataset is WithAccessibleAcl‹Resource›</em></p>
 <p>Whether the given <code class="docutils literal notranslate"><span class="pre">dataset</span></code> has a an ACL that is accessible to the current user.</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="hasacl">
 <h3>hasAcl<a class="headerlink" href="#hasacl" title="Permalink to this headline">¶</a></h3>
 <p>▸ <strong>hasAcl</strong>‹<strong>T</strong>›(<code class="docutils literal notranslate"><span class="pre">dataset</span></code>: T): <em>dataset is T &amp; WithAcl</em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L222">interfaces.ts:222</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L222">interfaces.ts:222</a></em></p>
 <p>Verify whether a given SolidDataset was fetched together with its Access Control List.</p>
 <p>Please note that the Web Access Control specification is not yet finalised, and hence, this
 function is still experimental and can change in a non-major release.</p>
@@ -609,7 +609,7 @@ function is still experimental and can change in a non-major release.</p>
 <div class="section" id="hasresourceinfo">
 <h3>hasResourceInfo<a class="headerlink" href="#hasresourceinfo" title="Permalink to this headline">¶</a></h3>
 <p>▸ <strong>hasResourceInfo</strong>‹<strong>T</strong>›(<code class="docutils literal notranslate"><span class="pre">resource</span></code>: T): <em>resource is T &amp; WithResourceInfo</em></p>
-<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/interfaces.ts#L194">interfaces.ts:194</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/e0a5bbb/src/interfaces.ts#L194">interfaces.ts:194</a></em></p>
 <p>Verify whether a given SolidDataset includes metadata about where it was retrieved from.</p>
 <p><strong><code class="docutils literal notranslate"><span class="pre">since</span></code></strong> 0.2.0</p>
 <p><strong>Type parameters:</strong></p>
