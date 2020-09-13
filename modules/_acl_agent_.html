@@ -1,0 +1,717 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Module: “acl/agent” &#8212; Inrupt solid-client Documentation</title>
+    
+  <link rel="stylesheet" href="../_static/css/index.d431a4ee1c1efae0e38bdfebc22debff.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/inrupt.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.30270b6e4c972e43c488.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Module: “acl/class”" href="_acl_class_.html" />
+    <link rel="prev" title="Module: “acl/acl”" href="_acl_acl_.html" />
+  
+    <meta name="robots" content="index" />
+  
+
+  <link rel="shortcut icon" href="https://docs.inrupt.com/inrupt_stickers_v2-03.png" type="image/png" />
+  <script type="text/javascript" src="https://inrupt.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e-T/-egccmf/b/24/a44af77267a987a660377e5c46e0fb64/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?locale=en-US&collectorId=41592d74"></script>
+
+  <!-- Matomo -->
+  <script type="text/javascript">
+    var _paq = window._paq || [];
+    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function() {
+      var u="https://mat.inrupt.com/";
+      _paq.push(['setTrackerUrl', u+'piwik.php']);
+      _paq.push(['setSiteId', '12']);
+      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+      g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+    })();
+  </script>
+  <!-- End Matomo Code -->
+
+  
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="https://inrupt.com/">
+      <img src="https://inrupt.com/sites/default/files/inrupt_email%20sign%20logo.jpg" class="logo" alt="logo">
+    </a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+          <li class="nav-item">
+             <a class="nav-link" href="https://docs.inrupt.com/ess/"> Enterprise Solid Server </a>
+          </li>
+          <li class="nav-item"><a class="nav-link" href="#">Client Libraries </a>
+               <ul class="nav-children">
+                     <li class="nav-item nav-childitem">
+                        <a href="https://docs.inrupt.com/developer-tools/javascript/client-libraries/"> JavaScript</a>
+                     </li>
+               </ul>
+          </li>
+          
+      </ul>
+
+
+      
+
+      
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar">
+
+<form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+
+
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+  <div class="bd-toc-item active">
+
+
+  
+  
+
+  
+  <ul class="nav bd-sidenav">
+     
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="../README.html">@itme/solid-client</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_acl_acl_.html">Module: “acl/acl”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item active toctree-l1"> <a class="nav-link" href="">Module: “acl/agent”</a>
+             
+             
+               
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_acl_class_.html">Module: “acl/class”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_acl_group_.html">Module: “acl/group”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_acl_mock_.html">Module: “acl/mock”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_interfaces_.html">Module: “interfaces”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_resource_mock_.html">Module: “resource/mock”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_resource_nonrdfdata_.html">Module: “resource/nonRdfData”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_resource_resource_.html">Module: “resource/resource”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_resource_soliddataset_.html">Module: “resource/solidDataset”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_thing_add_.html">Module: “thing/add”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_thing_get_.html">Module: “thing/get”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_thing_mock_.html">Module: “thing/mock”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_thing_remove_.html">Module: “thing/remove”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_thing_set_.html">Module: “thing/set”</a>
+             
+             
+             </li> 
+           
+      
+         
+             <li class="nav-item  toctree-l1"> <a class="nav-link" href="_thing_thing_.html">Module: “thing/thing”</a>
+             
+             
+             </li> 
+           
+      
+  </ul>
+</div>
+</nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#index" class="nav-link">Index</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#type-aliases" class="nav-link">Type aliases</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#functions" class="nav-link">Functions</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#id1" class="nav-link">Type aliases</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#agentaccess" class="nav-link">AgentAccess</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#id2" class="nav-link">Functions</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#getagentaccess" class="nav-link">getAgentAccess</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#getagentaccessall" class="nav-link">getAgentAccessAll</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#getagentdefaultaccess" class="nav-link">getAgentDefaultAccess</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#getagentdefaultaccessall" class="nav-link">getAgentDefaultAccessAll</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#getagentresourceaccess" class="nav-link">getAgentResourceAccess</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#getagentresourceaccessall" class="nav-link">getAgentResourceAccessAll</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#setagentdefaultaccess" class="nav-link">setAgentDefaultAccess</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#setagentresourceaccess" class="nav-link">setAgentResourceAccess</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+      <div class="alert alert-info">
+         <span class="alert-message">All libraries and documentation are currently in Beta. Content and features are subject to change.</span>
+      </div>
+  
+              <div>
+                
+  <p><a class="reference internal" href="../README.html"><span class="doc std std-doc">&#64;itme/solid-client</span></a> › <a class="reference internal" href="#"><span class="doc std std-doc">“acl/agent”</span></a></p>
+<div class="section" id="module-acl-agent">
+<h1>Module: “acl/agent”<a class="headerlink" href="#module-acl-agent" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="index">
+<h2>Index<a class="headerlink" href="#index" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="type-aliases">
+<h3>Type aliases<a class="headerlink" href="#type-aliases" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="_acl_agent_.html#agentaccess">AgentAccess</a></p></li>
+</ul>
+</div>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="_acl_agent_.html#getagentaccess">getAgentAccess</a></p></li>
+<li><p><a class="reference external" href="_acl_agent_.html#getagentaccessall">getAgentAccessAll</a></p></li>
+<li><p><a class="reference external" href="_acl_agent_.html#getagentdefaultaccess">getAgentDefaultAccess</a></p></li>
+<li><p><a class="reference external" href="_acl_agent_.html#getagentdefaultaccessall">getAgentDefaultAccessAll</a></p></li>
+<li><p><a class="reference external" href="_acl_agent_.html#getagentresourceaccess">getAgentResourceAccess</a></p></li>
+<li><p><a class="reference external" href="_acl_agent_.html#getagentresourceaccessall">getAgentResourceAccessAll</a></p></li>
+<li><p><a class="reference external" href="_acl_agent_.html#setagentdefaultaccess">setAgentDefaultAccess</a></p></li>
+<li><p><a class="reference external" href="_acl_agent_.html#setagentresourceaccess">setAgentResourceAccess</a></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="id1">
+<h2>Type aliases<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="agentaccess">
+<h3>AgentAccess<a class="headerlink" href="#agentaccess" title="Permalink to this headline">¶</a></h3>
+<p>Ƭ <strong>AgentAccess</strong>: <em>Record‹<a class="reference external" href="_interfaces_.html#webid">WebId</a>, <a class="reference external" href="_interfaces_.html#access">Access</a>›</em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/acl/agent.ts#L59">acl/agent.ts:59</a></em></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Web Access Control specification is not yet finalised. As such, this
+function is still experimental and subject to change, even in a non-major release.</p>
+</div>
+</div>
+</div>
+<div class="section" id="id2">
+<h2>Functions<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="getagentaccess">
+<h3>getAgentAccess<a class="headerlink" href="#getagentaccess" title="Permalink to this headline">¶</a></h3>
+<p>▸ <strong>getAgentAccess</strong>(<code class="docutils literal notranslate"><span class="pre">resourceInfo</span></code>: WithAcl &amp; <a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a>, <code class="docutils literal notranslate"><span class="pre">agent</span></code>: <a class="reference external" href="_interfaces_.html#webid">WebId</a>): <em><a class="reference external" href="_interfaces_.html#access">Access</a> | null</em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/acl/agent.ts#L75">acl/agent.ts:75</a></em></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is still experimental and subject to change, even in a non-major release.</p>
+</div>
+<p>Returns an Agent’s explicitly-granted Access Modes for the given Resource.</p>
+<p>The function does not return Access Modes granted indirectly to the Agent through other
+ACL rules, e.g., public or group-specific permissions.</p>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">resourceInfo</span></code></p></td>
+<td><p>WithAcl &amp; <a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a></p></td>
+<td><p>Information about the Resource to which the given Agent may have been granted access.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">agent</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#webid">WebId</a></p></td>
+<td><p>WebID of the Agent for which to retrieve what access it has to the Resource.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em><a class="reference external" href="_interfaces_.html#access">Access</a> | null</em></p>
+<p>Access Modes that have been explicitly granted to the Agent for the given Resource, or <code class="docutils literal notranslate"><span class="pre">null</span></code> if it could not be determined (e.g. because the current user does not have Control access to a given Resource or its Container).</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="getagentaccessall">
+<h3>getAgentAccessAll<a class="headerlink" href="#getagentaccessall" title="Permalink to this headline">¶</a></h3>
+<p>▸ <strong>getAgentAccessAll</strong>(<code class="docutils literal notranslate"><span class="pre">resourceInfo</span></code>: WithAcl &amp; <a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a>): <em><a class="reference external" href="_acl_agent_.html#agentaccess">AgentAccess</a> | null</em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/acl/agent.ts#L100">acl/agent.ts:100</a></em></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is still experimental and subject to change, even in a non-major release.</p>
+</div>
+<p>Returns all explicitly-granted Access Modes per Agent for the given Resource.</p>
+<p>The function does not return Access Modes granted indirectly to Agents through other
+ACL rules, e.g., public or group-specific permissions.</p>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">resourceInfo</span></code></p></td>
+<td><p>WithAcl &amp; <a class="reference external" href="_interfaces_.html#withresourceinfo">WithResourceInfo</a></p></td>
+<td><p>Information about the Resource to which Agents may have been granted access.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em><a class="reference external" href="_acl_agent_.html#agentaccess">AgentAccess</a> | null</em></p>
+<p>Access Modes per Agent that have been explicitly granted for the given Resource, or <code class="docutils literal notranslate"><span class="pre">null</span></code> if it could not be determined (e.g. because the current user does not have Control access to a given Resource or its Container).</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="getagentdefaultaccess">
+<h3>getAgentDefaultAccess<a class="headerlink" href="#getagentdefaultaccess" title="Permalink to this headline">¶</a></h3>
+<p>▸ <strong>getAgentDefaultAccess</strong>(<code class="docutils literal notranslate"><span class="pre">aclDataset</span></code>: <a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a>, <code class="docutils literal notranslate"><span class="pre">agent</span></code>: <a class="reference external" href="_interfaces_.html#webid">WebId</a>): <em><a class="reference external" href="_interfaces_.html#access">Access</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/acl/agent.ts#L245">acl/agent.ts:245</a></em></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is still experimental and subject to change, even in a non-major release.</p>
+</div>
+<p>Returns an Agent’s Access Modes explicitly granted for the children of the
+Container associated with the given ACL (Access Control List).</p>
+<p>The function does not return:</p>
+<ul class="simple">
+<li><p>Access Modes granted indirectly to the Agent through other ACL rules, e.g. public or group-specific permissions.</p></li>
+<li><p>Access Modes granted to the Agent for the Container Resource itself (see <a class="reference external" href="_acl_agent_.html#getagentresourceaccess">getAgentResourceAccess</a> instead).</p></li>
+</ul>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">aclDataset</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a></p></td>
+<td><p>The SolidDataset that contains Access-Control List rules for a certain Container.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">agent</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#webid">WebId</a></p></td>
+<td><p>WebID of the Agent for which to retrieve what access it has to the Container’s children.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em><a class="reference external" href="_interfaces_.html#access">Access</a></em></p>
+<p>Access Modes that have been explicitly granted to an Agent for the children of the Container associated with the given ACL.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="getagentdefaultaccessall">
+<h3>getAgentDefaultAccessAll<a class="headerlink" href="#getagentdefaultaccessall" title="Permalink to this headline">¶</a></h3>
+<p>▸ <strong>getAgentDefaultAccessAll</strong>(<code class="docutils literal notranslate"><span class="pre">aclDataset</span></code>: <a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a>): <em><a class="reference external" href="_acl_agent_.html#agentaccess">AgentAccess</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/acl/agent.ts#L275">acl/agent.ts:275</a></em></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is still experimental and subject to change, even in a non-major release.</p>
+</div>
+<p>Returns the Access Modes, per Agent, that have been explicitly granted for the children
+of the Container associated with the given ACL (Access Control List).</p>
+<p>The function does not return:</p>
+<ul class="simple">
+<li><p>Access Modes granted indirectly to the Agents through other ACL rules, e.g. public or group-specific permissions.</p></li>
+<li><p>Access Modes granted to the Agents for the Container Resource itself (see <a class="reference external" href="_acl_agent_.html#getagentresourceaccessall">getAgentResourceAccessAll</a> instead).</p></li>
+</ul>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">aclDataset</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a></p></td>
+<td><p>The SolidDataset that contains Access-Control List rules.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em><a class="reference external" href="_acl_agent_.html#agentaccess">AgentAccess</a></em></p>
+<p>Access Modes, per Agent, that have been explicitly granted for the children of the Container associated with the given ACL.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="getagentresourceaccess">
+<h3>getAgentResourceAccess<a class="headerlink" href="#getagentresourceaccess" title="Permalink to this headline">¶</a></h3>
+<p>▸ <strong>getAgentResourceAccess</strong>(<code class="docutils literal notranslate"><span class="pre">aclDataset</span></code>: <a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a>, <code class="docutils literal notranslate"><span class="pre">agent</span></code>: <a class="reference external" href="_interfaces_.html#webid">WebId</a>): <em><a class="reference external" href="_interfaces_.html#access">Access</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/acl/agent.ts#L131">acl/agent.ts:131</a></em></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is still experimental and subject to change, even in a non-major release.</p>
+</div>
+<p>Returns the Access Modes explicitly granted to an Agent for the Resource
+associated with an ACL (Access ControlList).</p>
+<p>The function does not return:</p>
+<ul class="simple">
+<li><p>Access Modes granted indirectly to the Agent through other ACL rules, e.g., public or group-specific permissions.</p></li>
+<li><p>Access Modes granted to the Agent for the child Resources if the associated Resource is a Container (see <a class="reference external" href="_acl_agent_.html#getagentdefaultaccess">getAgentDefaultAccess</a> instead).</p></li>
+</ul>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">aclDataset</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a></p></td>
+<td><p>The SolidDataset that contains ACL rules.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">agent</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#webid">WebId</a></p></td>
+<td><p>WebID of the Agent for which to retrieve what access it has to the Resource.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em><a class="reference external" href="_interfaces_.html#access">Access</a></em></p>
+<p>Access Modes that have been explicitly granted to an Agent for the Resource associated with an ACL SolidDataset.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="getagentresourceaccessall">
+<h3>getAgentResourceAccessAll<a class="headerlink" href="#getagentresourceaccessall" title="Permalink to this headline">¶</a></h3>
+<p>▸ <strong>getAgentResourceAccessAll</strong>(<code class="docutils literal notranslate"><span class="pre">aclDataset</span></code>: <a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a>): <em><a class="reference external" href="_acl_agent_.html#agentaccess">AgentAccess</a></em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/acl/agent.ts#L161">acl/agent.ts:161</a></em></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is still experimental and subject to change, even in a non-major release.</p>
+</div>
+<p>Returns the explicitly granted Access Modes per Agent for the Resource associated
+with an ACL (Access Control List).</p>
+<p>The function does not return:</p>
+<ul class="simple">
+<li><p>Access Modes granted indirectly to Agents through other ACL rules, e.g., public or group-specific permissions.</p></li>
+<li><p>Access Modes granted to Agents for the child Resources if the associated Resource is a Container.</p></li>
+</ul>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">aclDataset</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a></p></td>
+<td><p>The SolidDataset that contains ACL rules.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em><a class="reference external" href="_acl_agent_.html#agentaccess">AgentAccess</a></em></p>
+<p>Access Modes per Agent that have been explicitly granted for the Resource associated with an ACL SolidDataset.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="setagentdefaultaccess">
+<h3>setAgentDefaultAccess<a class="headerlink" href="#setagentdefaultaccess" title="Permalink to this headline">¶</a></h3>
+<p>▸ <strong>setAgentDefaultAccess</strong>(<code class="docutils literal notranslate"><span class="pre">aclDataset</span></code>: <a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a>, <code class="docutils literal notranslate"><span class="pre">agent</span></code>: <a class="reference external" href="_interfaces_.html#webid">WebId</a>, <code class="docutils literal notranslate"><span class="pre">access</span></code>: <a class="reference external" href="_interfaces_.html#access">Access</a>): <em><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a> &amp; WithChangeLog</em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/acl/agent.ts#L307">acl/agent.ts:307</a></em></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is still experimental and subject to change, even in a non-major release.</p>
+</div>
+<p>Modifies the default ACL (Access Control List) to set an Agent’s Access Modes for the Container’s children.
+Specifically, the function returns a new default ACL initialised with the given ACL and
+new rules for the Agent’s access.</p>
+<p>If rules already exist for the Agent in the given ACL, in the returned ACL, they are replaced by the new rules.</p>
+<p>This function does not modify:</p>
+<ul class="simple">
+<li><p>Access Modes granted indirectly to the Agent through other ACL rules, e.g., public or group-specific permissions.</p></li>
+<li><p>Access Modes granted to the Agent for the Container Resource itself.</p></li>
+<li><p>The original ACL.</p></li>
+</ul>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">aclDataset</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a></p></td>
+<td><p>The SolidDataset that contains Access-Control List rules.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">agent</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#webid">WebId</a></p></td>
+<td><p>The Agent to grant specific Access Modes.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">access</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#access">Access</a></p></td>
+<td><p>The Access Modes to grant to the Agent.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a> &amp; WithChangeLog</em></p>
+<p>A new default ACL initialised with the given <code class="docutils literal notranslate"><span class="pre">aclDataset</span></code> and <code class="docutils literal notranslate"><span class="pre">access</span></code> for the <code class="docutils literal notranslate"><span class="pre">agent</span></code>.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="setagentresourceaccess">
+<h3>setAgentResourceAccess<a class="headerlink" href="#setagentresourceaccess" title="Permalink to this headline">¶</a></h3>
+<p>▸ <strong>setAgentResourceAccess</strong>(<code class="docutils literal notranslate"><span class="pre">aclDataset</span></code>: <a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a>, <code class="docutils literal notranslate"><span class="pre">agent</span></code>: <a class="reference external" href="_interfaces_.html#webid">WebId</a>, <code class="docutils literal notranslate"><span class="pre">access</span></code>: <a class="reference external" href="_interfaces_.html#access">Access</a>): <em><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a> &amp; WithChangeLog</em></p>
+<p><em>Defined in <a class="reference external" href="https://github.com/itme/solid-client-js/blob/39cdfb0/src/acl/agent.ts#L193">acl/agent.ts:193</a></em></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is still experimental and subject to change, even in a non-major release.</p>
+</div>
+<p>Modifies the resource ACL (Access Control List) to set the Access Modes for the given Agent.
+Specifically, the function returns a new resource ACL initialised with the given ACL and
+new rules for the Agent’s access.</p>
+<p>If rules for Agent’s access already exist in the given ACL, in the returned ACL,
+they are replaced by the new rules.</p>
+<p>This function does not modify:</p>
+<ul class="simple">
+<li><p>Access Modes granted indirectly to Agents through other ACL rules, e.g., public or group-specific permissions.</p></li>
+<li><p>Access Modes granted to Agents for the child Resources if the associated Resource is a Container.</p></li>
+<li><p>The original ACL.</p></li>
+</ul>
+<p><strong>Parameters:</strong></p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">aclDataset</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a></p></td>
+<td><p>The SolidDataset that contains Access-Control List rules.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">agent</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#webid">WebId</a></p></td>
+<td><p>The Agent to grant specific Access Modes.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">access</span></code></p></td>
+<td><p><a class="reference external" href="_interfaces_.html#access">Access</a></p></td>
+<td><p>The Access Modes to grant to the Agent for the Resource.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em><a class="reference external" href="_interfaces_.html#acldataset">AclDataset</a> &amp; WithChangeLog</em></p>
+<p>A new resource ACL initialised with the given <code class="docutils literal notranslate"><span class="pre">aclDataset</span></code> and <code class="docutils literal notranslate"><span class="pre">access</span></code> for the <code class="docutils literal notranslate"><span class="pre">agent</span></code>.</p>
+</div>
+</div>
+</div>
+
+
+              </div>
+              
+
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="_acl_acl_.html" title="previous page">Module: “acl/acl”</a>
+    <a class='right-next' id="next-link" href="_acl_class_.html" title="next page">Module: “acl/class”</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.30270b6e4c972e43c488.js"></script>
+
+
+    <footer class="footer">
+  <div class="container">
+    <p>
+          &copy; Copyright 2020-present, Inrupt Inc.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
